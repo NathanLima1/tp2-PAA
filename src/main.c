@@ -71,7 +71,7 @@ int main(int argc, char *argv[]){
             printf("Erro ao ler o arquivo\n");
             exit(1);
         }
-        Graph* graph = create_graph(p);
+        Graph* graph = create_graph(p, c);
 
         for(int i = 0; i < p; i++){
             if(fscanf(fp, "%d %d %d", &pi, &wi, &hi) != 3){
@@ -88,6 +88,7 @@ int main(int argc, char *argv[]){
             }
             add_edge(graph, pi, pj, di);
         }
+        print_graph(graph);
         free_graph(graph);
         k--;
     }
