@@ -1,30 +1,6 @@
-#include "graph.h"
 #include <stdio.h>
 #include <stdlib.h>
-
-typedef struct town{
-    int id;
-    int weight;
-    int skill;
-}Town;
-
-typedef struct path
-{
-    int id1;
-    int id2;
-    int dist;
-    struct path* next;
-}Path;
-
-typedef struct graph
-{
-    int num_towns;
-    int num_edges;
-    int edge_count;
-    Town** towns;
-    Path* edges;
-}Graph;
-
+#include "graph.h"
 Town* create_town(int id, int weight, int skill){
     Town* p = (Town*)malloc(sizeof(Town));
     p->id = id;

@@ -4,7 +4,7 @@ OBJDIR = obj
 LIBDIR = lib
 
 folders = obj
-OBJS = $(OBJDIR)/graph.o
+OBJS = $(OBJDIR)/graph.o $(OBJDIR)/bf.o
 SRCS = main.c
 
 TARGET = tp2
@@ -19,6 +19,9 @@ $(folders):
 
 $(OBJDIR)/graph.o: graph.c graph.h
 	$(CC) $(CFLAGS) -c graph.c -o $@
+
+$(OBJDIR)/bf.o: bf.c bf.h
+	$(CC) $(CFLAGS) -c bf.c -o $@
 
 clean:
 	rm -f $(OBJDIR)/*.o $(TARGET)

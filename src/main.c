@@ -7,6 +7,7 @@
 #include <sys/resource.h>
 #include <stdbool.h>
 #include "graph.h"
+#include "bf.h"
 
 
 int main(int argc, char *argv[]){
@@ -88,8 +89,14 @@ int main(int argc, char *argv[]){
             }
             add_edge(graph, pi, pj, di);
         }
-        print_graph(graph);
+
+        prepare_adjacency(graph);
+        solve_bf(graph, d, w);
+        print_solution();
+
         free_graph(graph);
+        free_adjacency();
+        reset_globals();
         k--;
     }
     
