@@ -49,24 +49,41 @@ void incrementar(Dp1D *dp, int w, int v) {
 // https://youtu.be/OahcuBXLFlE
 void incrementar2D(Dp2D *dp, int *w, int *v) {
     // 0, 0 é o caso base
+    int *data = malloc((dp->m+1) * sizeof(int)*2);
     for (int i = 1; i <= dp->n; i++) {
         int w_atual = w[i-1];
         int v_atual = v[i-1];
-        for (int j = w_atual; j <= dp->m; j++) {
-            for (int k = 1; k <= j / w_atual; k++) {
+        int q, prev_c;
+        for (int j = 1; j <= dp->m; j++) { // j capacidade
+            for (int k = 0; k <= j / w_atual; k++) {
                 if (dp->data[i][j] < dp->data[i-1][j - k * w_atual] + v_atual * k) {
                     dp->data[i][j] = dp->data[i-1][j - k * w_atual] + v_atual * k;
+                    q = k;
+                    prev_c = j - k * w_atual;
                 }
             }
         }
+        data[i] = q;
+    }
+    // Reconstruir, tá errado, precisa armazenar a quantidade do item para cada capacidade
+
+    int max = dp->data[dp->n][dp->m];
+    int *solucao = malloc((dp->n) * sizeof(int));
+    for (int i = dp->n; i > 0; i--) {
+        max -= data[i] * v[i-1];
+
+        printf("i: %d, data[i]: %d\n", i, data[i]);
+
+        printf("Item (%d, %d): %d\n", w[i-1], v[i-1], data[i]);
+        if (max <= 0) break;
     }
 }
 
 void executarDP2D() {
     int n = 5;
-    int capacidade = 10;
-    int w[5] = {3, 4, 5, 6, 2};
-    int v[5] = {4, 5, 6, 7, 3};
+    int capacidade = 11;
+    int w[5] = {1, 4, 5, 6, 2};
+    int v[5] = {1, 5, 6, 7, 3};
 
     Dp2D *dp = dp2d(n, capacidade);
     
@@ -81,18 +98,17 @@ void executarDP2D() {
 
     free(dp->data);
     free(dp);
+    return;
 }
 
-int main() {
-    executarDP2D();
-    return 0;
+void executarDP1D() {
 
     int n = 5;
-    int capacidade = 10;
-    int w[5] = {3, 4, 5, 6, 2};
-    int v[5] = {4, 5, 6, 7, 3};
+    int capacidade = 11;
+    int w[5] = {1, 4, 5, 6, 2};
+    int v[5] = {1, 5, 6, 7, 3};
 
-    Dp1D *dp = dp1d(10);
+    Dp1D *dp = dp1d(capacidade);
 
     // Pode incrementar um novo item aos poucos
     // Fazer a interseção dos conjuntos para aproveitar os cálculos que começam iguais é uma alternativa
@@ -113,5 +129,10 @@ int main() {
     free(dp->data);
     free(dp);
 
+    return;
+}
+int main() {
+    executarDP2D();
+    // executarDP1D();
     return 0;
 }
