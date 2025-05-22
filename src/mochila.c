@@ -65,7 +65,7 @@ void incrementar2D(Dp2D *dp, int *w, int *v) {
         }
         data[i] = q;
     }
-    // Reconstruir, tá errado, precisa armazenar a quantidade do item para cada capacidade
+    // Reconstruir, tá errado, precisa armazenar a quantidade do item para cada capacidade, prev_c
 
     int max = dp->data[dp->n][dp->m];
     int *solucao = malloc((dp->n) * sizeof(int));
