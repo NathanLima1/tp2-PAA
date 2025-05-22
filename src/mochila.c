@@ -69,10 +69,8 @@ void executarDP2D() {
     int v[5] = {4, 5, 6, 7, 3};
 
     Dp2D *dp = dp2d(n, capacidade);
-
-    for (int i = 0; i < n; i++) {
-        incrementar2D(dp, w, v);
-    }
+    
+    incrementar2D(dp, w, v);
 
     for (int i = 0; i <= dp->n; i++) {
         for (int j = 0; j <= dp->m; j++) {
