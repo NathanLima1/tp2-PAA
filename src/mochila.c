@@ -1,26 +1,23 @@
 #include "headers.h"
 
 typedef struct {
-    int *data;
-    int size;
-} Dp1D;
-
-typedef struct {
     int value;
     int q; // quantidade
-    int j; // quantidade anterior
+    int prev_q; // quantidade anterior
 } DpItem;
 
 typedef struct {
     DpItem **data;
     int n;
     int m;
-} Dp2D;
+    int h; // Profundidade calculada na matriz
+} Dp;
 
-Dp2D *dp2d(int n, int m) {
-    Dp2D *dp = (Dp2D*)malloc(sizeof(Dp2D));
+Dp *dp_init(int n, int m) {
+    Dp *dp = (Dp*)malloc(sizeof(Dp));
     dp->n = n;
     dp->m = m;
+    dp->h = 1;
     m++;
     n++;
     dp->data = (DpItem**)malloc((n) * sizeof(DpItem*));
@@ -34,27 +31,8 @@ Dp2D *dp2d(int n, int m) {
     return dp;
 }
 
-Dp1D *dp1d(int size) {
-    Dp1D *dp = (Dp1D*)malloc(sizeof(Dp1D));
-    dp->size = size; // O tamanho a ser considerado será a capacidade, ignorando a posição 0
-    size++; // A primeira posição é 0
-    dp->data = (int*)malloc((size) * sizeof(int));
-    for (int i = 0; i < size; i++) {
-        dp->data[i] = 0;
-    }
-    return dp;
-}
-
-void incrementar(Dp1D *dp, int w, int v) {
-    for (int i = w; i <= dp->size; i++) {
-        if (dp->data[i] < dp->data[i - w] + v) {
-            dp->data[i] = dp->data[i - w] + v;
-        }
-    }
-}
-
 // https://youtu.be/OahcuBXLFlE
-void incrementar2D(Dp2D *dp, int *w, int *v) {
+void calc(Dp *dp, int *w, int *v) {
     for (int i = 1; i <= dp->n; i++) {
         int w_atual = w[i-1];
         int v_atual = v[i-1];
@@ -62,36 +40,69 @@ void incrementar2D(Dp2D *dp, int *w, int *v) {
             for (int k = 0; k <= j / w_atual; k++) {
                 if (dp->data[i][j].value < dp->data[i-1][j - k * w_atual].value + v_atual * k) {
                     dp->data[i][j].value = dp->data[i-1][j - k * w_atual].value + v_atual * k;
-                    dp->data[i][j].q = k;
-                    dp->data[i][j].j = j - k * w_atual;
+                    dp->data[i][j].q = k; // Quantidade do item atual
+                    dp->data[i][j].prev_q = j - k * w_atual; // Quantidade do item anterior 
                 }
             }
         }
-    }
-
-    int max = dp->data[dp->n][dp->m].value;
-    int idx = dp->m;
-    for (int i = dp->n; i > 0; i--) {
-        max -= dp->data[i][idx].q * v[i-1];
-        
-        // printf("i: %d, q: %d, idx, %d\n", i, dp->data[i][idx].q, dp->data[i][idx].j);
-
-        printf("Item (%d, %d): %d\n", w[i-1], v[i-1], dp->data[i][idx].q);
-        idx = dp->data[i][idx].j;
-        if (max <= 0) break;
+        dp->h = i;
     }
 }
 
-void executarDP2D() {
+void show(Dp *dp, int *w, int *v) {
+    int max = dp->data[dp->h][dp->m].value;
+    int idx = dp->m;
+    for (int i = dp->h; i > 0; i--) {
+        max -= dp->data[i][idx].q * v[i-1];
+        
+        // printf("i: %d, q: %d, idx, %d\n", i, dp->data[i][idx].q, dp->data[i][idx].j);
+        if(dp->data[i][idx].q > 0) {
+            printf("Item (%d, %d): %d\n", w[i-1], v[i-1], dp->data[i][idx].q);
+        }
+        idx = dp->data[i][idx].prev_q;
+        if (max <= 0) break;
+    }
+}
+void undo(Dp *dp) {
+    if (dp->h <= 0) return;
+    for (int j = 0; j <= dp->m; j++) {
+        dp->data[dp->h][j].value = 0;
+        dp->data[dp->h][j].q = 0;
+        dp->data[dp->h][j].prev_q = 0;
+    }
+    dp->h--;
+    return;
+}
+
+void iter(Dp *dp, int w_atual, int v_atual) {
+    if (dp->h >= dp->n) {
+        printf("[ ! ] Profundidade maior do que o numero de itens\n");
+        return;
+    }
+    int i = dp->h + 1;
+    for (int j = 1; j <= dp->m; j++) { // j capacidade
+        for (int k = 0; k <= j / w_atual; k++) {
+            if (dp->data[i][j].value < dp->data[i-1][j - k * w_atual].value + v_atual * k) {
+                dp->data[i][j].value = dp->data[i-1][j - k * w_atual].value + v_atual * k;
+                dp->data[i][j].q = k; // Quantidade do item atual
+                dp->data[i][j].prev_q = j - k * w_atual; // Quantidade do item anterior 
+            }
+        }
+    }
+    dp->h = i;
+
+}
+void executar() {
     int n = 5;
     int capacidade = 11;
-    int w[5] = {1, 2, 5, 6, 4};
-    int v[5] = {1, 3, 6, 7, 5};
+    int w[5] = {1, 4, 5, 6, 2};
+    int v[5] = {1, 5, 6, 7, 3};
 
-    Dp2D *dp = dp2d(n, capacidade);
-    
-    incrementar2D(dp, w, v);
+    Dp *dp = dp_init(n, capacidade);
 
+    calc(dp, w, v);
+
+    // Iteracao completa
     for (int i = 0; i <= dp->n; i++) {
         for (int j = 0; j <= dp->m; j++) {
             printf("%d ", dp->data[i][j]);
@@ -99,43 +110,43 @@ void executarDP2D() {
         printf("\n");
     }
 
-    free(dp->data);
-    free(dp);
-    return;
-}
+    printf("\n");
+    show(dp, w, v);
+    printf("\n");
 
-void executarDP1D() {
+    undo(dp);
 
-    int n = 5;
-    int capacidade = 11;
-    int w[5] = {1, 4, 5, 6, 2};
-    int v[5] = {1, 5, 6, 7, 3};
+    // Desfez a ultima linha
+    for (int i = 0; i <= dp->n; i++) {
+        for (int j = 0; j <= dp->m; j++) {
+            printf("%d ", dp->data[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+    show(dp, w, v);
+    printf("\n");
 
-    Dp1D *dp = dp1d(capacidade);
+    iter(dp, 2, 3);
 
-    // Pode incrementar um novo item aos poucos
-    // Fazer a interseção dos conjuntos para aproveitar os cálculos que começam iguais é uma alternativa
-    // Exemplo: 1, 2, 3, 4, 5
-    //          1, 2, 3, 5, 6
-    // Calcular para 1, 2, 3 e 5
-    // Depois para 4 -> [1, 2, 3, 5], 4
-    // Depois para 6 -> [1, 2, 3, 5], 6
-
-    for (int i = 0; i < n; i++) {
-        incrementar(dp, w[i], v[i]);
-
-        printf("Incrementando item (%d, %d)\n", w[i], v[i]);
-        for (int j = 0; j <= dp->size; j++) printf("%d ", dp->data[j]);
+    // Refez a ultima linha
+    for (int i = 0; i <= dp->n; i++) {
+        for (int j = 0; j <= dp->m; j++) {
+            printf("%d ", dp->data[i][j]);
+        }
         printf("\n");
     }
 
+    printf("\n");
+    show(dp, w, v);
+    printf("\n");
+
     free(dp->data);
     free(dp);
-
     return;
 }
+
 int main() {
-    executarDP2D();
-    // executarDP1D();
+    executar();
     return 0;
 }
