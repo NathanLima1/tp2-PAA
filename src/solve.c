@@ -83,7 +83,6 @@ void dfs(Graph *g, int start, int depth, Dp *dp, Dp *max_dp, int max_weight) {
         iter(dp, atual->weight, atual->skill);
         printf("Iter %d\n", start);
     }
-
     int bak_descendente = atual->descendente;
     atual->descendente = 1;
 
@@ -106,6 +105,8 @@ void dfs(Graph *g, int start, int depth, Dp *dp, Dp *max_dp, int max_weight) {
 
                     // Copia os dados do dp atual para o max_dp
                     for (int i = 0; i <= max_dp->n; i++) {
+                        max_dp->line_weight[i] = dp->line_weight[i];
+                        max_dp->line_v[i] = dp->line_v[i];
                         for (int j = 0; j <= max_dp->m; j++) {
                             max_dp->data[i][j].value = dp->data[i][j].value;
                             max_dp->data[i][j].q = dp->data[i][j].q;

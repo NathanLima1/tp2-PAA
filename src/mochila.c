@@ -9,8 +9,12 @@ Dp *dp_init(int n, int m) {
     m++;
     n++;
     dp->data = (DpItem**)malloc((n) * sizeof(DpItem*));
+    dp->line_weight = (int*)malloc((n) * sizeof(int));
+    dp->line_v = (int*)malloc((n) * sizeof(int));
     for (int i = 0; i < n; i++) {
         dp->data[i] = (DpItem*)malloc((m) * sizeof(DpItem));
+        dp->line_weight[i] = 0;
+        dp->line_v[i] = 0;
         for (int j = 0; j < m; j++) {
             DpItem item = {0, 0};
             dp->data[i][j] = item;
@@ -25,9 +29,9 @@ void show(Dp *dp, int *w, int *v) {
     for (int i = dp->h; i > 0; i--) {
         max -= dp->data[i][idx].q * v[i-1];
         
-        printf("i: %d, q: %d, idx, %d\n", i, dp->data[i][idx].q, dp->data[i][idx].prev_q);
+        // printf("i: %d, q: %d, idx, %d\n", i, dp->data[i][idx].q, dp->data[i][idx].prev_q);
         if(dp->data[i][idx].q >= 0) {
-            printf("Item (%d, %d): %d\n", w[i-1], v[i-1], dp->data[i][idx].q);
+            printf("Item (%d, %d): %d\n", dp->line_weight[i], dp->line_v[i], dp->data[i][idx].q);
         }
         idx = dp->data[i][idx].prev_q;
         if (max <= 0);
@@ -40,6 +44,8 @@ void undo(Dp *dp) {
         dp->data[dp->h][j].q = 0;
         dp->data[dp->h][j].prev_q = 0;
     }
+    dp->line_weight[dp->h] = 0;
+    dp->line_v[dp->h] = 0;
     dp->h--;
     return;
 }
@@ -49,6 +55,8 @@ void calc(Dp *dp, int *w, int *v) {
     for (int i = 1; i <= dp->n; i++) {
         int w_atual = w[i-1];
         int v_atual = v[i-1];
+        dp->line_weight[i] = w_atual;
+        dp->line_v[i] = v_atual;
         for (int j = 1; j <= dp->m; j++) { // j capacidade
             for (int k = 0; k <= j / w_atual; k++) {
                 if (dp->data[i][j].value < dp->data[i-1][j - k * w_atual].value + v_atual * k) {
@@ -73,15 +81,17 @@ void iter(Dp *dp, int w_atual, int v_atual) {
         return;
     }
     int i = dp->h + 1;
-        for (int j = 1; j <= dp->m; j++) { // j capacidade
-            for (int k = 0; k <= j / w_atual; k++) {
-                if (dp->data[i][j].value < dp->data[i-1][j - k * w_atual].value + v_atual * k) {
-                    dp->data[i][j].value = dp->data[i-1][j - k * w_atual].value + v_atual * k;
-                    dp->data[i][j].q = k; // Quantidade do item atual
-                    dp->data[i][j].prev_q = j - k * w_atual; // Quantidade do item anterior 
-                }
+    dp->line_weight[i] = w_atual;
+    dp->line_v[i] = v_atual;
+    for (int j = 1; j <= dp->m; j++) { // j capacidade
+        for (int k = 0; k <= j / w_atual; k++) {
+            if (dp->data[i][j].value < dp->data[i-1][j - k * w_atual].value + v_atual * k) {
+                dp->data[i][j].value = dp->data[i-1][j - k * w_atual].value + v_atual * k;
+                dp->data[i][j].q = k; // Quantidade do item atual
+                dp->data[i][j].prev_q = j - k * w_atual; // Quantidade do item anterior 
             }
         }
+    }
     dp->h = i;
 
     return;
@@ -91,7 +101,7 @@ void iter(Dp *dp, int w_atual, int v_atual) {
 void print_dp(Dp *dp) {
     for (int i = 0; i <= dp->n; i++) {
         for (int j = 0; j <= dp->m; j++) {
-            printf("%d ", dp->data[i][j].value);
+            printf("(%d %d) + %dv ", i+1, j, dp->data[i][j].q);
         }
         printf("\n");
     }
