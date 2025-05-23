@@ -14,7 +14,6 @@ typedef struct town{
     neighbor *neighbors;
     int num_neighbors;
     int descendente; // Posso retroceder apenas em vizinhos que já foram visitados
-    int disabled;
 }Town;
 
 typedef struct graph
@@ -31,7 +30,6 @@ Town *create_town(int id, int weight, int skill){
     town->num_neighbors = 0;
     town->neighbors = malloc(sizeof(neighbor));
     town->descendente = 0;
-    town->disabled = 0;
     return town;
 }
 Graph *create_graph(int num_towns){
@@ -131,7 +129,7 @@ int main() {
     int v[] = {2, 3, 7, 4, 3, 1};
     int w[] = {70, 100, 20, 90, 20, 10};
     int n = 6;
-    int D = 10;
+    int max_depth = 10;
     int m = 310;
 
     for (int i = 0; i < n; i++){
@@ -148,10 +146,10 @@ int main() {
 
     Dp *dp = dp_init(n, m);
     Dp *max_dp = dp_init(n, m);
-    
+
+    // O algoritmo inicia aqui
     for(int i = 0; i < n; i++){
-        g->towns[i]->disabled = 1;
-        dfs(g, i, D, dp, max_dp);
+        dfs(g, i, max_depth, dp, max_dp);
         reset_graph(g);
     };
 
