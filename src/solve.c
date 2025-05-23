@@ -78,8 +78,14 @@ void free_graph(Graph *graph){
 
 void dfs(Graph *g, int start, int depth, Dp *dp, Dp *max_dp, int max_weight) {
     Town *atual = g->towns[start];
+
+    if (!atual->descendente) {
+        iter(dp, atual->weight, atual->skill);
+        printf("Iter %d\n", start);
+    }
+
+    int bak_descendente = atual->descendente;
     atual->descendente = 1;
-    iter(dp, atual->weight, atual->skill);
 
     for(int i = 0; i < atual->num_neighbors; i++) {
         int id = atual->neighbors[i].id;
@@ -89,12 +95,14 @@ void dfs(Graph *g, int start, int depth, Dp *dp, Dp *max_dp, int max_weight) {
 
             int new_depth = depth - dist;
 
-            if (new_depth >= 0 && (start < id || g->towns[id]->descendente)) {
+            if (new_depth >= 0 && ((!g->towns[id]->descendente && start < id) || (g->towns[id]->descendente && start > id))) {
                 dfs(g, id, new_depth, dp, max_dp, max_weight);
 
             } else {
                 if (dp->data[dp->h][dp->m].value > max_dp->data[max_dp->h][max_dp->m].value) {
                     max_dp->h = dp->h;
+                    max_weight = dp->data[dp->h][dp->m].value;
+                    printf("Max %d\n", max_weight);
 
                     // Copia os dados do dp atual para o max_dp
                     for (int i = 0; i <= max_dp->n; i++) {
@@ -111,8 +119,11 @@ void dfs(Graph *g, int start, int depth, Dp *dp, Dp *max_dp, int max_weight) {
             atual->neighbors[i].visited = 0;
         }
     }
-    atual->descendente = 0;
-    undo(dp);
+    if (!bak_descendente) {
+        atual->descendente = 0;
+        undo(dp);
+        printf("Undo %d\n", start);
+    }
 }
 
 int main() {
@@ -144,6 +155,5 @@ int main() {
     };
 
     show(max_dp, w, v);
-    print_dp(max_dp);
     return 0;
 }

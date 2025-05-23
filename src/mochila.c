@@ -25,12 +25,12 @@ void show(Dp *dp, int *w, int *v) {
     for (int i = dp->h; i > 0; i--) {
         max -= dp->data[i][idx].q * v[i-1];
         
-        // printf("i: %d, q: %d, idx, %d\n", i, dp->data[i][idx].q, dp->data[i][idx].j);
-        if(dp->data[i][idx].q > 0) {
+        printf("i: %d, q: %d, idx, %d\n", i, dp->data[i][idx].q, dp->data[i][idx].prev_q);
+        if(dp->data[i][idx].q >= 0) {
             printf("Item (%d, %d): %d\n", w[i-1], v[i-1], dp->data[i][idx].q);
         }
         idx = dp->data[i][idx].prev_q;
-        if (max <= 0) break;
+        if (max <= 0);
     }
 }
 void undo(Dp *dp) {
@@ -82,7 +82,6 @@ void iter(Dp *dp, int w_atual, int v_atual) {
                 }
             }
         }
-        dp->h = i;
     dp->h = i;
 
     return;
@@ -98,28 +97,28 @@ void print_dp(Dp *dp) {
     }
 }
 
-int main() {
-    int v[] = {2, 3, 7, 4, 3, 1};
-    int w[] = {70, 100, 20, 90, 20, 10};
-    int n = 6;
-    int capacidade = 310;
+// int main() {
+//     int v[] = {2, 3, 4, 7, 3, 1};
+//     int w[] = {70, 100, 90, 20, 20, 10};
+//     int n = 6;
+//     int capacidade = 310;
 
-    Dp *dp = dp_init(n, capacidade);
+//     Dp *dp = dp_init(n, capacidade);
 
-    for (int i = 0; i < n; i++) {
-        iter(dp, w[i], v[i]);
-    }
+//     for (int i = 0; i < n; i++) {
+//         iter(dp, w[i], v[i]);
+//     }
 
-    for (int i = 0; i < n; i++) {
-        undo(dp);
-    }
+//     for (int i = 0; i < n; i++) {
+//         undo(dp);
+//     }
 
-    for (int i = 0; i < n; i++) {
-        iter(dp, w[i], v[i]);
-    }
+//     for (int i = 0; i < n; i++) {
+//         iter(dp, w[i], v[i]);
+//     }
 
-    show(dp, w, v);
-    free(dp->data);
-    free(dp);
-    return 0;
-}
+//     show(dp, w, v);
+//     free(dp->data);
+//     free(dp);
+//     return 0;
+// }
