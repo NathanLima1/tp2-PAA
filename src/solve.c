@@ -83,6 +83,7 @@ void free_graph(Graph *graph){
     void dfs(Graph *g, int start, int depth, void *dp, void *max_dp, int max_weight) {
         Town *atual = g->towns[start];
         atual->descendente = 1;
+        // mochila.incrementar(dp, atual->weight, atual->skill);
         for(int i = 0; i < atual->num_neighbors; i++) {
             int id = atual->neighbors[i].id;
             if(!atual->neighbors[i].visited) {
@@ -97,13 +98,12 @@ void free_graph(Graph *graph){
                     atual->neighbors[i].visited = 0;
                 } else {
                     // Cheguei no final
-                    // mochila.incrementar(dp, atual->weight, atual->skill);
                     // if mochila.get_max(dp) > mochila.get_max(max_dp) {
                     //     max_dp = dp
                     //     max_weight = mochila.get_max(dp)
-                    // mochila.undo()
                 }
             }
         }
         atual->descendente = 0;
+        // mochila.undo()
     }
