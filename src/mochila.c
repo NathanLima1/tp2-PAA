@@ -23,6 +23,17 @@ Dp *dp_init(int n, int m) {
     return dp;
 }
 
+void free_dp(Dp *dp) {
+    if (dp == NULL) return;
+    for (int i = 0; i <= dp->n; i++) {
+        free(dp->data[i]);
+    }
+    free(dp->data);
+    free(dp->line_weight);
+    free(dp->line_v);
+    free(dp);
+}
+
 void show(Dp *dp, int *w, int *v) {
     int max = dp->data[dp->h][dp->m].value;
     int idx = dp->m;

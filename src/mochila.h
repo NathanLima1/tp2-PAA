@@ -19,6 +19,7 @@ typedef struct {
 } Dp;
 
 Dp *dp_init(int n, int m);
+void free_dp(Dp *dp);
 void calc(Dp *dp, int *w, int *v);
 void show(Dp *dp, int *w, int *v);
 void undo(Dp *dp);

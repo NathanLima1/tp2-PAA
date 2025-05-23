@@ -14,6 +14,7 @@ typedef struct town{
     neighbor *neighbors;
     int num_neighbors;
     int descendente; // Posso retroceder apenas em vizinhos que já foram visitados
+    int disabled;
 }Town;
 
 typedef struct graph
@@ -30,6 +31,7 @@ Town *create_town(int id, int weight, int skill){
     town->num_neighbors = 0;
     town->neighbors = malloc(sizeof(neighbor));
     town->descendente = 0;
+    town->disabled = 0;
     return town;
 }
 Graph *create_graph(int num_towns){
@@ -76,12 +78,11 @@ void free_graph(Graph *graph){
     free(graph);
 }
 
-void dfs(Graph *g, int start, int depth, Dp *dp, Dp *max_dp, int max_weight) {
+void dfs(Graph *g, int start, int depth, Dp *dp, Dp *max_dp) {
     Town *atual = g->towns[start];
 
     if (!atual->descendente) {
         iter(dp, atual->weight, atual->skill);
-        printf("Iter %d\n", start);
     }
     int bak_descendente = atual->descendente;
     atual->descendente = 1;
@@ -90,31 +91,30 @@ void dfs(Graph *g, int start, int depth, Dp *dp, Dp *max_dp, int max_weight) {
         int id = atual->neighbors[i].id;
         if(!atual->neighbors[i].visited) {
             atual->neighbors[i].visited = 1;
-            int dist = atual->neighbors[i].dist;
 
-            int new_depth = depth - dist;
+            int new_depth = depth - atual->neighbors[i].dist;
+            int descendente = g->towns[id]->descendente;
 
-            if (new_depth >= 0 && ((!g->towns[id]->descendente && start < id) || (g->towns[id]->descendente && start > id))) {
-                dfs(g, id, new_depth, dp, max_dp, max_weight);
-
-            } else {
-                if (dp->data[dp->h][dp->m].value > max_dp->data[max_dp->h][max_dp->m].value) {
-                    max_dp->h = dp->h;
-                    max_weight = dp->data[dp->h][dp->m].value;
-                    printf("Max %d\n", max_weight);
-
-                    // Copia os dados do dp atual para o max_dp
-                    for (int i = 0; i <= max_dp->n; i++) {
-                        max_dp->line_weight[i] = dp->line_weight[i];
-                        max_dp->line_v[i] = dp->line_v[i];
-                        for (int j = 0; j <= max_dp->m; j++) {
-                            max_dp->data[i][j].value = dp->data[i][j].value;
-                            max_dp->data[i][j].q = dp->data[i][j].q;
-                            max_dp->data[i][j].prev_q = dp->data[i][j].prev_q;
+            if ((!descendente && start < id) || (descendente && start > id)) {
+                if (new_depth >= 0) {
+                    dfs(g, id, new_depth, dp, max_dp);
+                } else {
+                    if (dp->data[dp->h][dp->m].value > max_dp->data[max_dp->h][max_dp->m].value) {
+                        max_dp->h = dp->h;
+                    
+                        // Copia os dados do dp atual para o max_dp
+                        for (int i = 0; i <= max_dp->n; i++) {
+                            max_dp->line_weight[i] = dp->line_weight[i];
+                            max_dp->line_v[i] = dp->line_v[i];
+                            for (int j = 0; j <= max_dp->m; j++) {
+                                max_dp->data[i][j].value = dp->data[i][j].value;
+                                max_dp->data[i][j].q = dp->data[i][j].q;
+                                max_dp->data[i][j].prev_q = dp->data[i][j].prev_q;
+                            }
                         }
                     }
+                
                 }
-
             }
 
             atual->neighbors[i].visited = 0;
@@ -123,7 +123,6 @@ void dfs(Graph *g, int start, int depth, Dp *dp, Dp *max_dp, int max_weight) {
     if (!bak_descendente) {
         atual->descendente = 0;
         undo(dp);
-        printf("Undo %d\n", start);
     }
 }
 
@@ -151,10 +150,15 @@ int main() {
     Dp *max_dp = dp_init(n, m);
     
     for(int i = 0; i < n; i++){
-        dfs(g, i, D, dp, max_dp, m);
+        g->towns[i]->disabled = 1;
+        dfs(g, i, D, dp, max_dp);
         reset_graph(g);
     };
 
     show(max_dp, w, v);
+
+    free_graph(g);
+    free_dp(dp);
+    free_dp(max_dp);
     return 0;
 }
