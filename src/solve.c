@@ -11,7 +11,7 @@ typedef struct town{
 
     neighbor *neighbors;
     int num_neighbors;
-    int visited; // Posso retroceder apenas em vizinhos que já foram visitados
+    int descendente; // Posso retroceder apenas em vizinhos que já foram visitados
 }Town;
 
 typedef struct graph
@@ -33,7 +33,7 @@ Town *create_town(int id, int weight, int skill){
     town->skill = skill;
     town->num_neighbors = 0;
     town->neighbors = malloc(sizeof(neighbor));
-    town->visited = 0;
+    town->descendente = 0;
     return town;
 }
 Graph *create_graph(int num_towns, int num_edges){
@@ -66,7 +66,7 @@ void reset_graph(Graph *graph){
         for (int j = 0; j < graph->towns[i]->num_neighbors; j++){
             graph->towns[i]->neighbors[j].visited = 0;
         }
-        graph->towns[i]->visited = 0;
+        graph->towns[i]->descendente = 0;
     }
 }
 
@@ -80,25 +80,30 @@ void free_graph(Graph *graph){
     free(graph);
 }
 
-int dfs(Graph *g, int start, int depth) {
-    Town *atual = g->towns[start];
-    atual->visited = 1;
-    // mochila.incrementar(dp, atual->weight, atual->skill);
-    for(int i = 0; i < atual->num_neighbors; i++) {
-        int id = atual->neighbors[i].id;
-        if(!atual->neighbors[i].visited) {
-            atual->neighbors[i].visited = 1;
-            int dist = atual->neighbors[i].dist;
+    void dfs(Graph *g, int start, int depth, void *dp, void *max_dp, int max_weight) {
+        Town *atual = g->towns[start];
+        atual->descendente = 1;
+        for(int i = 0; i < atual->num_neighbors; i++) {
+            int id = atual->neighbors[i].id;
+            if(!atual->neighbors[i].visited) {
+                atual->neighbors[i].visited = 1;
+                int dist = atual->neighbors[i].dist;
 
-            printf("Ok\n");
+                printf("Ok\n");
 
-            int new_depth = depth - dist;
-            if (new_depth >= 0) {
-                dfs(g, id, new_depth);
-                atual->neighbors[i].visited = 0;
+                int new_depth = depth - dist;
+                if (new_depth >= 0 && (start < id || g->towns[id]->descendente)) {
+                    dfs(g, id, new_depth, dp, max_dp, max_weight);
+                    atual->neighbors[i].visited = 0;
+                } else {
+                    // Cheguei no final
+                    // mochila.incrementar(dp, atual->weight, atual->skill);
+                    // if mochila.get_max(dp) > mochila.get_max(max_dp) {
+                    //     max_dp = dp
+                    //     max_weight = mochila.get_max(dp)
+                    // mochila.undo()
+                }
             }
         }
+        atual->descendente = 0;
     }
-    atual->visited = 0;
-    // mochila.undo(dp);
-}
