@@ -92,7 +92,18 @@ void iter(Dp *dp, int w_atual, int v_atual) {
     dp->h = i;
 
 }
-void executar() {
+
+void print_dp(Dp *dp) {
+    for (int i = 0; i <= dp->n; i++) {
+        for (int j = 0; j <= dp->m; j++) {
+            printf("%d ", dp->data[i][j].value);
+        }
+        printf("\n");
+    }
+}
+
+int main() {
+    
     int n = 5;
     int capacidade = 11;
     int w[5] = {1, 4, 5, 6, 2};
@@ -101,52 +112,26 @@ void executar() {
     Dp *dp = dp_init(n, capacidade);
 
     calc(dp, w, v);
-
-    // Iteracao completa
-    for (int i = 0; i <= dp->n; i++) {
-        for (int j = 0; j <= dp->m; j++) {
-            printf("%d ", dp->data[i][j]);
-        }
-        printf("\n");
-    }
-
+    print_dp(dp);
     printf("\n");
     show(dp, w, v);
     printf("\n");
 
+    // Desfaz a ultima linha
     undo(dp);
-
-    // Desfez a ultima linha
-    for (int i = 0; i <= dp->n; i++) {
-        for (int j = 0; j <= dp->m; j++) {
-            printf("%d ", dp->data[i][j]);
-        }
-        printf("\n");
-    }
+    print_dp(dp);
     printf("\n");
     show(dp, w, v);
     printf("\n");
 
+    // Refaz a ultima linha
     iter(dp, 2, 3);
-
-    // Refez a ultima linha
-    for (int i = 0; i <= dp->n; i++) {
-        for (int j = 0; j <= dp->m; j++) {
-            printf("%d ", dp->data[i][j]);
-        }
-        printf("\n");
-    }
-
+    print_dp(dp);
     printf("\n");
     show(dp, w, v);
     printf("\n");
 
     free(dp->data);
     free(dp);
-    return;
-}
-
-int main() {
-    executar();
     return 0;
 }
