@@ -144,6 +144,6 @@ int main() {
     };
 
     show(max_dp, w, v);
-
+    print_dp(max_dp);
     return 0;
 }

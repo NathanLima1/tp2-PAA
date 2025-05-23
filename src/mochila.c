@@ -5,7 +5,7 @@ Dp *dp_init(int n, int m) {
     Dp *dp = (Dp*)malloc(sizeof(Dp));
     dp->n = n;
     dp->m = m;
-    dp->h = 1;
+    dp->h = 0;
     m++;
     n++;
     dp->data = (DpItem**)malloc((n) * sizeof(DpItem*));
@@ -17,24 +17,6 @@ Dp *dp_init(int n, int m) {
         }
     }
     return dp;
-}
-
-// https://youtu.be/OahcuBXLFlE
-void calc(Dp *dp, int *w, int *v) {
-    for (int i = 1; i <= dp->n; i++) {
-        int w_atual = w[i-1];
-        int v_atual = v[i-1];
-        for (int j = 1; j <= dp->m; j++) { // j capacidade
-            for (int k = 0; k <= j / w_atual; k++) {
-                if (dp->data[i][j].value < dp->data[i-1][j - k * w_atual].value + v_atual * k) {
-                    dp->data[i][j].value = dp->data[i-1][j - k * w_atual].value + v_atual * k;
-                    dp->data[i][j].q = k; // Quantidade do item atual
-                    dp->data[i][j].prev_q = j - k * w_atual; // Quantidade do item anterior 
-                }
-            }
-        }
-        dp->h = i;
-    }
 }
 
 void show(Dp *dp, int *w, int *v) {
@@ -62,6 +44,24 @@ void undo(Dp *dp) {
     return;
 }
 
+// https://youtu.be/OahcuBXLFlE
+void calc(Dp *dp, int *w, int *v) {
+    for (int i = 1; i <= dp->n; i++) {
+        int w_atual = w[i-1];
+        int v_atual = v[i-1];
+        for (int j = 1; j <= dp->m; j++) { // j capacidade
+            for (int k = 0; k <= j / w_atual; k++) {
+                if (dp->data[i][j].value < dp->data[i-1][j - k * w_atual].value + v_atual * k) {
+                    dp->data[i][j].value = dp->data[i-1][j - k * w_atual].value + v_atual * k;
+                    dp->data[i][j].q = k; // Quantidade do item atual
+                    dp->data[i][j].prev_q = j - k * w_atual; // Quantidade do item anterior 
+                }
+            }
+        }
+        dp->h = i;
+    }
+}
+
 void iter(Dp *dp, int w_atual, int v_atual) {
     if (dp->h >= dp->n) {
         printf("[ ! ] Profundidade maior do que o numero de itens\n");
@@ -73,15 +73,16 @@ void iter(Dp *dp, int w_atual, int v_atual) {
         return;
     }
     int i = dp->h + 1;
-    for (int j = 1; j <= dp->m; j++) { // j capacidade
-        for (int k = 0; k <= j / w_atual; k++) {
-            if (dp->data[i][j].value < dp->data[i-1][j - k * w_atual].value + v_atual * k) {
-                dp->data[i][j].value = dp->data[i-1][j - k * w_atual].value + v_atual * k;
-                dp->data[i][j].q = k; // Quantidade do item atual
-                dp->data[i][j].prev_q = j - k * w_atual; // Quantidade do item anterior 
+        for (int j = 1; j <= dp->m; j++) { // j capacidade
+            for (int k = 0; k <= j / w_atual; k++) {
+                if (dp->data[i][j].value < dp->data[i-1][j - k * w_atual].value + v_atual * k) {
+                    dp->data[i][j].value = dp->data[i-1][j - k * w_atual].value + v_atual * k;
+                    dp->data[i][j].q = k; // Quantidade do item atual
+                    dp->data[i][j].prev_q = j - k * w_atual; // Quantidade do item anterior 
+                }
             }
         }
-    }
+        dp->h = i;
     dp->h = i;
 
     return;
@@ -97,36 +98,28 @@ void print_dp(Dp *dp) {
     }
 }
 
-// int main() {
-    
-//     int n = 5;
-//     int capacidade = 11;
-//     int w[5] = {1, 4, 5, 6, 2};
-//     int v[5] = {1, 5, 6, 7, 3};
+int main() {
+    int v[] = {2, 3, 7, 4, 3, 1};
+    int w[] = {70, 100, 20, 90, 20, 10};
+    int n = 6;
+    int capacidade = 310;
 
-//     Dp *dp = dp_init(n, capacidade);
+    Dp *dp = dp_init(n, capacidade);
 
-//     calc(dp, w, v);
-//     print_dp(dp);
-//     printf("\n");
-//     show(dp, w, v);
-//     printf("\n");
+    for (int i = 0; i < n; i++) {
+        iter(dp, w[i], v[i]);
+    }
 
-//     // Desfaz a ultima linha
-//     undo(dp);
-//     print_dp(dp);
-//     printf("\n");
-//     show(dp, w, v);
-//     printf("\n");
+    for (int i = 0; i < n; i++) {
+        undo(dp);
+    }
 
-//     // Refaz a ultima linha
-//     iter(dp, 2, 3);
-//     print_dp(dp);
-//     printf("\n");
-//     show(dp, w, v);
-//     printf("\n");
+    for (int i = 0; i < n; i++) {
+        iter(dp, w[i], v[i]);
+    }
 
-//     free(dp->data);
-//     free(dp);
-//     return 0;
-// }
+    show(dp, w, v);
+    free(dp->data);
+    free(dp);
+    return 0;
+}
