@@ -83,6 +83,7 @@ void free_graph(Graph *graph){
 int dfs(Graph *g, int start, int depth) {
     Town *atual = g->towns[start];
     atual->visited = 1;
+    // mochila.incrementar(dp, atual->weight, atual->skill);
     for(int i = 0; i < atual->num_neighbors; i++) {
         int id = atual->neighbors[i].id;
         if(!atual->neighbors[i].visited) {
@@ -99,4 +100,5 @@ int dfs(Graph *g, int start, int depth) {
         }
     }
     atual->visited = 0;
+    // mochila.undo(dp);
 }
