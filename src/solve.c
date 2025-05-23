@@ -1,3 +1,5 @@
+#include "mochila.h"
+
 typedef struct {
     int id;
     int dist;
@@ -20,12 +22,6 @@ typedef struct graph
     Town** towns;
 }Graph;
 
-Town* create_town(int id, int weight, int skill);
-Graph* create_graph(int num_towns, int num_edges);
-void add_conn(Graph* graph, int id1, int id2, int dist);
-void free_graph(Graph* graph);
-void print_graph(Graph* graph);
-
 Town *create_town(int id, int weight, int skill){
     Town *town = (Town*)malloc(sizeof(Town));
     town->id = id;
@@ -36,7 +32,7 @@ Town *create_town(int id, int weight, int skill){
     town->descendente = 0;
     return town;
 }
-Graph *create_graph(int num_towns, int num_edges){
+Graph *create_graph(int num_towns){
     Graph *graph = (Graph*)malloc(sizeof(Graph));
     graph->size = num_towns;
     graph->towns = (Town**)malloc(num_towns * sizeof(Town*));
@@ -80,30 +76,74 @@ void free_graph(Graph *graph){
     free(graph);
 }
 
-    void dfs(Graph *g, int start, int depth, void *dp, void *max_dp, int max_weight) {
-        Town *atual = g->towns[start];
-        atual->descendente = 1;
-        // mochila.incrementar(dp, atual->weight, atual->skill);
-        for(int i = 0; i < atual->num_neighbors; i++) {
-            int id = atual->neighbors[i].id;
-            if(!atual->neighbors[i].visited) {
-                atual->neighbors[i].visited = 1;
-                int dist = atual->neighbors[i].dist;
+void dfs(Graph *g, int start, int depth, Dp *dp, Dp *max_dp, int max_weight) {
+    Town *atual = g->towns[start];
+    atual->descendente = 1;
+    iter(dp, atual->weight, atual->skill);
 
-                printf("Ok\n");
+    for(int i = 0; i < atual->num_neighbors; i++) {
+        int id = atual->neighbors[i].id;
+        if(!atual->neighbors[i].visited) {
+            atual->neighbors[i].visited = 1;
+            int dist = atual->neighbors[i].dist;
 
-                int new_depth = depth - dist;
-                if (new_depth >= 0 && (start < id || g->towns[id]->descendente)) {
-                    dfs(g, id, new_depth, dp, max_dp, max_weight);
-                    atual->neighbors[i].visited = 0;
-                } else {
-                    // Cheguei no final
-                    // if mochila.get_max(dp) > mochila.get_max(max_dp) {
-                    //     max_dp = dp
-                    //     max_weight = mochila.get_max(dp)
+            int new_depth = depth - dist;
+
+            if (new_depth >= 0 && (start < id || g->towns[id]->descendente)) {
+                dfs(g, id, new_depth, dp, max_dp, max_weight);
+
+            } else {
+                if (dp->data[dp->h][dp->m].value > max_dp->data[max_dp->h][max_dp->m].value) {
+                    max_dp->h = dp->h;
+
+                    // Copia os dados do dp atual para o max_dp
+                    for (int i = 0; i <= max_dp->n; i++) {
+                        for (int j = 0; j <= max_dp->m; j++) {
+                            max_dp->data[i][j].value = dp->data[i][j].value;
+                            max_dp->data[i][j].q = dp->data[i][j].q;
+                            max_dp->data[i][j].prev_q = dp->data[i][j].prev_q;
+                        }
+                    }
                 }
+
             }
+
+            atual->neighbors[i].visited = 0;
         }
-        atual->descendente = 0;
-        // mochila.undo()
     }
+    atual->descendente = 0;
+    undo(dp);
+}
+
+int main() {
+    Graph *g = create_graph(6);
+    int v[] = {2, 3, 7, 4, 3, 1};
+    int w[] = {70, 100, 20, 90, 20, 10};
+    int n = 6;
+    int D = 10;
+    int m = 310;
+
+    for (int i = 0; i < n; i++){
+        g->towns[i]->weight = w[i];
+        g->towns[i]->skill = v[i];
+    }
+    add_conn(g, 0, 1, 3);
+    add_conn(g, 0, 4, 2);
+    add_conn(g, 1, 2, 4);
+    add_conn(g, 1, 3, 2);
+    add_conn(g, 2, 5, 3);
+    add_conn(g, 3, 4, 3);
+    add_conn(g, 3, 5, 5);
+
+    Dp *dp = dp_init(n, m);
+    Dp *max_dp = dp_init(n, m);
+    
+    for(int i = 0; i < n; i++){
+        dfs(g, i, D, dp, max_dp, m);
+        reset_graph(g);
+    };
+
+    show(max_dp, w, v);
+
+    return 0;
+}

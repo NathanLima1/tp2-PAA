@@ -1,17 +1,5 @@
 #include "headers.h"
-
-typedef struct {
-    int value;
-    int q; // quantidade
-    int prev_q; // quantidade anterior
-} DpItem;
-
-typedef struct {
-    DpItem **data;
-    int n;
-    int m;
-    int h; // Profundidade calculada na matriz
-} Dp;
+#include "mochila.h"
 
 Dp *dp_init(int n, int m) {
     Dp *dp = (Dp*)malloc(sizeof(Dp));
@@ -79,6 +67,11 @@ void iter(Dp *dp, int w_atual, int v_atual) {
         printf("[ ! ] Profundidade maior do que o numero de itens\n");
         return;
     }
+
+    if (w_atual == 0) {
+        printf("[ ! ] Peso atual igual a 0\n");
+        return;
+    }
     int i = dp->h + 1;
     for (int j = 1; j <= dp->m; j++) { // j capacidade
         for (int k = 0; k <= j / w_atual; k++) {
@@ -91,6 +84,8 @@ void iter(Dp *dp, int w_atual, int v_atual) {
     }
     dp->h = i;
 
+    return;
+
 }
 
 void print_dp(Dp *dp) {
@@ -102,36 +97,36 @@ void print_dp(Dp *dp) {
     }
 }
 
-int main() {
+// int main() {
     
-    int n = 5;
-    int capacidade = 11;
-    int w[5] = {1, 4, 5, 6, 2};
-    int v[5] = {1, 5, 6, 7, 3};
+//     int n = 5;
+//     int capacidade = 11;
+//     int w[5] = {1, 4, 5, 6, 2};
+//     int v[5] = {1, 5, 6, 7, 3};
 
-    Dp *dp = dp_init(n, capacidade);
+//     Dp *dp = dp_init(n, capacidade);
 
-    calc(dp, w, v);
-    print_dp(dp);
-    printf("\n");
-    show(dp, w, v);
-    printf("\n");
+//     calc(dp, w, v);
+//     print_dp(dp);
+//     printf("\n");
+//     show(dp, w, v);
+//     printf("\n");
 
-    // Desfaz a ultima linha
-    undo(dp);
-    print_dp(dp);
-    printf("\n");
-    show(dp, w, v);
-    printf("\n");
+//     // Desfaz a ultima linha
+//     undo(dp);
+//     print_dp(dp);
+//     printf("\n");
+//     show(dp, w, v);
+//     printf("\n");
 
-    // Refaz a ultima linha
-    iter(dp, 2, 3);
-    print_dp(dp);
-    printf("\n");
-    show(dp, w, v);
-    printf("\n");
+//     // Refaz a ultima linha
+//     iter(dp, 2, 3);
+//     print_dp(dp);
+//     printf("\n");
+//     show(dp, w, v);
+//     printf("\n");
 
-    free(dp->data);
-    free(dp);
-    return 0;
-}
+//     free(dp->data);
+//     free(dp);
+//     return 0;
+// }
