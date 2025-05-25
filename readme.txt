@@ -21,3 +21,9 @@ data[distancia restante][vértice sendo analisado][capacidade sendo analisada]
 onde cada célula representa uma struct do tipo DpItem, formada por value, prev, prev_c, prev_d
 
 Com cada capacidade, distância e vértice anterior salvo, é possível reconstruir a solução apenas percorrendo por eles e considerando algum critério de parada
+isso é feito na função "reconstruir"
+onde:
+
+e já imprime o resultado
+
+Pseudo código da função calc: ??
