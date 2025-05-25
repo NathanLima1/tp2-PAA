@@ -104,19 +104,31 @@ void reconstruir(Dp *dp) {
     int dist = dp->dist;
     int capacidade = dp->capacidade;
 
+    int *solucao = (int*)malloc(sizeof(int)*dp->dist*2);
+    i = 0;
+    int last_index = 0;
     while (1) {
-
-        printf("%d %d ", v, atual->q);
+        solucao[2*i] = v;
+        solucao[2*i+1] = atual->q;
+        if (atual->q != 0) {
+            last_index = 2*i + 1;
+        }
         dist = atual->prev_d;
 
         capacidade = atual->prev_c;
 
-        // Se repetir um vértice ou não houver mais capacidade, pode parar
-        if (v == atual->prev || !dist || !capacidade) {
+        // Para quando entra em um ciclo ou não há mais distância
+        if (v == atual->prev || !dist) {
             break;
         }
+
         v = atual->prev;
         atual = &dp->data[dist][v][capacidade];
+        i++;
     }
+    for (int i = 0; i <= last_index; i += 2) {
+        printf("%d %d ", solucao[i], solucao[i + 1]);
+    }
+    free(solucao);
     printf("\b\n");
 }
