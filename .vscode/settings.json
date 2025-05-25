@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "mochila.h": "c",
-        "stdbool.h": "c"
+        "stdbool.h": "c",
+        "heuristica.h": "c",
+        "stdio.h": "c"
     }
 }

@@ -4,25 +4,28 @@ OBJDIR = obj
 LIBDIR = lib
 
 folders = obj
-OBJS = $(OBJDIR)/graph.o $(OBJDIR)/bf.o
-SRCS = main.c
+OBJS = $(OBJDIR)/graph.o $(OBJDIR)/solve.o $(OBJDIR)/heuristica.o
+SRCS = src/main.c
 
 TARGET = tp2
 
 all: $(TARGET)
 
 $(TARGET): $(folders) $(OBJS) $(SRCS)
-	$(CC) $(CFLAGS) -o $@ $(SRCS) $(OBJS)
+    $(CC) $(CFLAGS) -o $@ $(SRCS) $(OBJS)
 
 $(folders):
-	mkdir -p $(folders)
+    mkdir -p $(folders)
 
-$(OBJDIR)/graph.o: graph.c graph.h
-	$(CC) $(CFLAGS) -c graph.c -o $@
+$(OBJDIR)/graph.o: src/graph.c src/graph.h
+    $(CC) $(CFLAGS) -c src/graph.c -o $@
 
-$(OBJDIR)/bf.o: bf.c bf.h
-	$(CC) $(CFLAGS) -c bf.c -o $@
+$(OBJDIR)/solve.o: src/solve.c src/solve.h src/graph.h
+    $(CC) $(CFLAGS) -c src/solve.c -o $@
+
+$(OBJDIR)/heuristica.o: src/heuristica.c src/heuristica.h src/solve.h src/graph.h
+    $(CC) $(CFLAGS) -c src/heuristica.c -o $@
 
 clean:
-	rm -f $(OBJDIR)/*.o $(TARGET)
-	rm -r $(folders)
+    rm -f $(OBJDIR)/*.o $(TARGET)
+    rm -r $(folders)

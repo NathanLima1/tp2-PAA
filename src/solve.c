@@ -29,6 +29,17 @@ Dp *dp_init(int profundidade, int num_vertices, int capacidade) {
     return dp;
 }
 
+void free_dp(Dp *dp) {
+    for (int i = 0; i < dp->dist; i++) {
+        for (int j = 0; j < dp->vertice; j++) {
+            free(dp->data[i][j]);
+        }
+        free(dp->data[i]);
+    }
+    free(dp->data);
+    free(dp);
+}
+
 void calc(Dp *dp, Graph *g) {
     for (int dist = 0; dist <= dp->dist; dist++) {
         for (int vertice = 1; vertice <= dp->vertice; vertice++) {
@@ -67,25 +78,6 @@ void calc(Dp *dp, Graph *g) {
     }
 }
 
-
-Graph *init_graph(int num_vertices) {
-    Graph *graph = (Graph*)malloc(sizeof(Graph));
-    graph->num_vertices = num_vertices;
-    graph->data = (int**)malloc(num_vertices * sizeof(int*));
-    graph->towns = (Town*)malloc(num_vertices * sizeof(Town));
-    for (int i = 0; i < num_vertices; i++) {
-        graph->data[i] = (int *)malloc(num_vertices * sizeof(int));
-        for (int j = 0; j < num_vertices; j++) {
-            graph->data[i][j] = 0;
-        }
-    }
-    return graph;
-}
-
-void add_conn(Graph *graph, int id1, int id2, int dist) {
-    graph->data[id1][id2] = dist;
-    graph->data[id2][id1] = dist;
-}
 
 void minimizar_solucao(int *solucao, int n) {
     for (int i = 0; i <= n; i += 2) {

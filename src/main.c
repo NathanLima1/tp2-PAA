@@ -1,14 +1,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
-#include "getopt.h"
+#include <getopt.h>
 #include <string.h>
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <stdbool.h>
-#include "graph.h"
-#include "bf.h"
+#include "solve.h"
+#include "heuristica.h"
 
+void programacao_dinamica() {
+}
 
 int main(int argc, char *argv[]){
     FILE *fp = stdin;
@@ -72,31 +74,39 @@ int main(int argc, char *argv[]){
             printf("Erro ao ler o arquivo\n");
             exit(1);
         }
-        Graph* graph = create_graph(p, c);
+        // Graph* graph = create_graph(p, c);
+
+        Graph *g = init_graph(p);
+        int num_vertices = p;
+        int max_depth = d;
+        int capacidade = w;
 
         for(int i = 0; i < p; i++){
             if(fscanf(fp, "%d %d %d", &pi, &wi, &hi) != 3){
                 printf("Erro ao ler o arquivo\n");
                 exit(1);
             }
-            add_town(graph, pi, wi, hi);
-        }
 
+            g->towns[pi - 1].w = wi;
+            g->towns[pi - 1].v = hi;
+        }
         for(int i = 0; i < c; i++){
             if(fscanf(fp, "%d %d %d", &pi, &pj, &di) != 3){
                 printf("Erro ao ler o arquivo\n");
                 exit(1);
             }
-            add_edge(graph, pi, pj, di);
+            add_conn(g, pi - 1, pj - 1, di);
         }
 
-        prepare_adjacency(graph);
-        solve_bf(graph, d, w);
-        print_solution();
-
-        free_graph(graph);
-        free_adjacency();
-        reset_globals();
+        if (option == 2) {
+            heuristica(g, max_depth, capacidade);
+        } else {
+            Dp *dp = dp_init(max_depth, num_vertices, capacidade);
+            calc(dp, g);
+            reconstruir(dp);
+            free_dp(dp);
+        }
+        free_graph(g);
         k--;
     }
     
@@ -137,6 +147,6 @@ int main(int argc, char *argv[]){
 
     fclose(fp);
     fclose(fp_out);
-    
+
     return 0;
 }
