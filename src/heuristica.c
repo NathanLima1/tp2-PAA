@@ -7,9 +7,9 @@
 
 int get_max(int **g, int *w, int *v, int n, int capacidade, int viz, int toggle) {
     int max = -1;
-    float max_razao = 0;
+    int max_razao = 0;
     for (int i = 1; i < n; i++) {
-        float razao = capacidade / w[i] * v[i];
+        int razao = capacidade / w[i] * v[i];
         if ((g[i][viz] || !toggle) && razao > max_razao) {
             max_razao = razao;
             max = i;
