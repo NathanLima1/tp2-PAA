@@ -40,12 +40,16 @@ int main() {
     int cabe = 1;
     int i = get_max(g, w, v, n, capacidade, 0, 0);
     int prev_i = i;
+    int *solucao = malloc(sizeof(int) * distancia*2);
+    int j = 0;
     while (1) {
         c[i] = capacidade / w[i]; 
         habilidade += c[i] * v[i];
         capacidade -= c[i] * w[i];
         v[i] = 0; // Deleta
-        printf("%d %d ", i+1, c[i]);
+
+        solucao[j] = i+1;
+        solucao[j+1] = c[i];
 
         distancia -= g[i][prev_i];
         prev_i = i;
@@ -55,8 +59,14 @@ int main() {
         if (i == -1 || capacidade < 0) {
             break;
         }
+        j += 2;
     }
 
-    printf("%d\n", habilidade);
+    printf("%d ", habilidade);
+
+    for(int i = 0; i <= j; i += 2) {
+        printf("%d %d ", solucao[i], solucao[i+1]);
+    }
+    printf("\n");
     return 0;
 }
