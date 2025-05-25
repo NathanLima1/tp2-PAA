@@ -8,6 +8,12 @@
 #include <stdbool.h>
 #include "solve.h"
 
+void heuristica(Graph *g, int max_depth, int capacidade) {
+
+}
+
+void programacao_dinamica() {
+}
 
 int main(int argc, char *argv[]){
     FILE *fp = stdin;
@@ -73,7 +79,7 @@ int main(int argc, char *argv[]){
         }
         // Graph* graph = create_graph(p, c);
 
-        int **g = init_graph(p);
+        Graph *g = init_graph(p);
         int *pesos = malloc(sizeof(int)*p); // Pesos
         int *valores = malloc(sizeof(int)*p); // Habilidades
         int num_vertices = p;
@@ -86,10 +92,9 @@ int main(int argc, char *argv[]){
                 exit(1);
             }
 
-            pesos[pi - 1] = wi;
-            valores[pi - 1] = hi;
+            g->towns[pi - 1].w = wi;
+            g->towns[pi - 1].v = hi;
         }
-
         for(int i = 0; i < c; i++){
             if(fscanf(fp, "%d %d %d", &pi, &pj, &di) != 3){
                 printf("Erro ao ler o arquivo\n");
@@ -99,7 +104,7 @@ int main(int argc, char *argv[]){
         }
 
         Dp *dp = dp_init(max_depth, num_vertices, capacidade);
-        calc(dp, pesos, valores, g);
+        calc(dp, g);
         reconstruir(dp);
         k--;
     }
@@ -141,6 +146,6 @@ int main(int argc, char *argv[]){
 
     fclose(fp);
     fclose(fp_out);
-    
+
     return 0;
 }

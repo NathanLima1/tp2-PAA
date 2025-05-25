@@ -5,12 +5,12 @@
 
 
 
-int get_max(int **g, int *w, int *v, int n, int capacidade, int viz, int toggle) {
+int get_max(Graph *g, int capacidade, int viz, int toggle) {
     int max = -1;
     int max_razao = 0;
-    for (int i = 1; i < n; i++) {
-        int razao = capacidade / w[i] * v[i];
-        if ((g[i][viz] || !toggle) && razao > max_razao) {
+    for (int i = 1; i < g->num_vertices; i++) {
+        int razao = capacidade / g->towns[i].w * g->towns[i].v;
+        if ((g->data[i][viz] || !toggle) && razao > max_razao) {
             max_razao = razao;
             max = i;
         }
@@ -20,9 +20,14 @@ int get_max(int **g, int *w, int *v, int n, int capacidade, int viz, int toggle)
 }
 
 int main() {
-    int **g = init_graph(6);
+    Graph *g = init_graph(6);
     int v[] = {2, 3, 7, 4, 3, 1};
     int w[] = {70, 100, 20, 90, 20, 10};
+    for (int i = 0; i < 6; i++) {
+        g->towns[i].v = v[i];
+        g->towns[i].w = w[i];
+    }
+
     int c[6] = {0, 0, 0, 0, 0, 0};
     int n = 6;
     int distancia = 10;
@@ -38,7 +43,7 @@ int main() {
     add_conn(g, 3, 5, 5);
 
     int cabe = 1;
-    int i = get_max(g, w, v, n, capacidade, 0, 0);
+    int i = get_max(g, capacidade, 0, 0);
     int prev_i = i;
     int *solucao = malloc(sizeof(int) * distancia*2);
     int j = 0;
@@ -55,7 +60,7 @@ int main() {
         prev_i = i;
 
         // Maior vizinho
-        i = get_max(g, w, v, n, capacidade, prev_i, 1);
+        i = get_max(g, capacidade, prev_i, 1);
         if (i == -1 || capacidade < 0) {
             break;
         }

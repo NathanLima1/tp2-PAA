@@ -29,11 +29,11 @@ Dp *dp_init(int profundidade, int num_vertices, int capacidade) {
     return dp;
 }
 
-void calc(Dp *dp, int *w, int *v, int **g) {
+void calc(Dp *dp, Graph *g) {
     for (int dist = 0; dist <= dp->dist; dist++) {
         for (int vertice = 1; vertice <= dp->vertice; vertice++) {
-            int w_atual = w[vertice - 1];
-            int v_atual = v[vertice - 1];
+            int w_atual = g->towns[vertice - 1].w;
+            int v_atual = g->towns[vertice - 1].v;
             for (int capacidade = 0; capacidade <= dp->capacidade; capacidade++) {
                 // Atualiza os valores para evitar colunas[Vet:Cap] vazias na matriz em distâncias impossíveis pelo grafo
                 // Exemplo para o vértice 3 no caso de teste, é impossível ter uma distância de 1, pois o vértice mais próximo está a 3
@@ -48,7 +48,7 @@ void calc(Dp *dp, int *w, int *v, int **g) {
                 for (int u = 1; u <= dp->vertice; u++) {
                     
                     // Para todos os vizinhos alcançáveis
-                    int d = g[u - 1][vertice - 1];
+                    int d = g->data[u - 1][vertice - 1];
                     if (d == 0 || dist - d < 0) continue;
                     for (int l = 0; l <= (capacidade / w_atual); l++) {
                         int prev_c = capacidade - l * w_atual;
@@ -68,20 +68,23 @@ void calc(Dp *dp, int *w, int *v, int **g) {
 }
 
 
-int **init_graph(int num_vertices) {
-    int **graph = (int **)malloc(num_vertices * sizeof(int *));
+Graph *init_graph(int num_vertices) {
+    Graph *graph = (Graph*)malloc(sizeof(Graph));
+    graph->num_vertices = num_vertices;
+    graph->data = (int**)malloc(num_vertices * sizeof(int*));
+    graph->towns = (Town*)malloc(num_vertices * sizeof(Town));
     for (int i = 0; i < num_vertices; i++) {
-        graph[i] = (int *)malloc(num_vertices * sizeof(int));
+        graph->data[i] = (int *)malloc(num_vertices * sizeof(int));
         for (int j = 0; j < num_vertices; j++) {
-            graph[i][j] = 0;
+            graph->data[i][j] = 0;
         }
     }
     return graph;
 }
 
-void add_conn(int **graph, int id1, int id2, int dist) {
-    graph[id1][id2] = dist;
-    graph[id2][id1] = dist;
+void add_conn(Graph *graph, int id1, int id2, int dist) {
+    graph->data[id1][id2] = dist;
+    graph->data[id2][id1] = dist;
 }
 
 void minimizar_solucao(int *solucao, int n) {
