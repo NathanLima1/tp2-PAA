@@ -99,18 +99,23 @@ void reconstruir(int **g, Dp *dp) {
     int v = i;
     int dist = dp->dist;
     int capacidade = dp->capacidade;
-    while (capacidade) {
+    while (1) {
         printf("%d %d\n", v, atual->q);
+        dist -= g[v - 1][atual->prev - 1];
         capacidade = atual->prev_c;
         v = atual->prev;
         atual = &dp->data[dist][v][capacidade];
+        
+        if (v == atual->prev && atual->prev_c == capacidade) {
+            break;
+        }
     }
 }
 int main() {
     
     int **g = init_graph(6);
     int v[] = {2, 3, 7, 4, 3, 1};
-    int w[] = {70, 100, 20, 90, 20, 10};
+    int w[] = {70, 100, 35, 90, 20, 10};
     int num_vertices = 6;
     int max_depth = 10;
     int capacidade = 310;
