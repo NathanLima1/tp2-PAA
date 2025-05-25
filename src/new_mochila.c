@@ -136,36 +136,35 @@ void reconstruir(Dp *dp, int **g, int *w) {
 }
 int main() {
     
-    // int **g = init_graph(6);
-    // int v[] = {2, 3, 7, 4, 3, 1};
-    // int w[] = {70, 100, 20, 90, 20, 10};
-    // int num_vertices = 6;
-    // int max_depth = 10;
-    // int capacidade = 310;
-
-    // add_conn(g, 0, 1, 3);
-    // add_conn(g, 0, 4, 2);
-    // add_conn(g, 1, 2, 4);
-    // add_conn(g, 1, 3, 2);
-    // add_conn(g, 2, 5, 3);
-    // add_conn(g, 3, 4, 3);
-    // add_conn(g, 3, 5, 5);
-
-    
-    
-    int **g = init_graph(5);
-    int v[] = {10, 9, 1, 6, 4};
-    int w[] = {10, 30, 1, 3, 2};
-    int num_vertices = 5;
-    int max_depth = 6;
-    int capacidade = 317;
-
+    int **g = init_graph(6);
+    int v[] = {2, 3, 7, 4, 3, 1};
+    int w[] = {70, 100, 20, 90, 20, 10};
+    int num_vertices = 6;
+    int max_depth = 10;
+    int capacidade = 310;
     add_conn(g, 0, 1, 3);
-    add_conn(g, 0, 2, 2);
-    add_conn(g, 0, 3, 2);
-    add_conn(g, 1, 2, 1);
-    add_conn(g, 2, 4, 3);
-    add_conn(g, 3, 4, 4);
+    add_conn(g, 0, 4, 2);
+    add_conn(g, 1, 2, 4);
+    add_conn(g, 1, 3, 2);
+    add_conn(g, 2, 5, 3);
+    add_conn(g, 3, 4, 3);
+    add_conn(g, 3, 5, 5);
+
+    
+    
+    // int **g = init_graph(5);
+    // int v[] = {10, 9, 1, 6, 4};
+    // int w[] = {10, 30, 1, 3, 2};
+    // int num_vertices = 5;
+    // int max_depth = 6;
+    // int capacidade = 317;
+// 
+    // add_conn(g, 0, 1, 3);
+    // add_conn(g, 0, 2, 2);
+    // add_conn(g, 0, 3, 2);
+    // add_conn(g, 1, 2, 1);
+    // add_conn(g, 2, 4, 3);
+    // add_conn(g, 3, 4, 4);
 
     Dp *dp = dp_init(max_depth, num_vertices, capacidade);
     calc(dp, w, v, g);

@@ -45,7 +45,6 @@ void calc(Dp *dp, int *w, int *v, int **g) {
                 dp->data[dist][vertice][capacidade].prev_c = capacidade - new_v;
                 dp->data[dist][vertice][capacidade].prev = vertice;
                 dp->data[dist][vertice][capacidade].prev_d = dist;
-
                 for (int u = 1; u <= dp->vertice; u++) {
                     
                     // Para todos os vizinhos alcançáveis
@@ -85,6 +84,32 @@ void add_conn(int **graph, int id1, int id2, int dist) {
     graph[id2][id1] = dist;
 }
 
+void minimizar_solucao(int *solucao, int n) {
+    for (int i = 0; i <= n; i += 2) {
+        int pivo_v = solucao[i];
+        int pivo_q = solucao[i + 1];
+        if (pivo_v == -1) {
+            continue;
+        }
+        int last_zero = i;
+        int j;
+        for (j = i + 2; j <= n; j += 2) {
+            int next_pivo_v = solucao[j];
+            int next_pivo_q = solucao[j + 1];
+            if (next_pivo_q) {
+                break;
+            }
+
+            if (next_pivo_v == pivo_v) {
+                last_zero = j;
+            }
+        }
+
+        for(int k = i+2; k <= last_zero; k += 2) {
+            solucao[k] = -1; // Invalida a solução
+        }
+    }
+}
 void reconstruir(Dp *dp) {
     DpItem *atual;
     int max_v = 1;
@@ -104,14 +129,14 @@ void reconstruir(Dp *dp) {
     int dist = dp->dist;
     int capacidade = dp->capacidade;
 
-    int *solucao = (int*)malloc(sizeof(int)*dp->dist*2);
+    int *solucao = (int*)malloc(sizeof(int)*dp->dist*2 + 2);
     i = 0;
     int last_index = 0;
     while (1) {
-        solucao[2*i] = v;
-        solucao[2*i+1] = atual->q;
+        solucao[i] = v;
+        solucao[i+1] = atual->q;
         if (atual->q != 0) {
-            last_index = 2*i + 1;
+            last_index = i + 1;
         }
         dist = atual->prev_d;
 
@@ -124,10 +149,14 @@ void reconstruir(Dp *dp) {
 
         v = atual->prev;
         atual = &dp->data[dist][v][capacidade];
-        i++;
+        i += 2;
     }
+
+    minimizar_solucao(solucao, last_index);
     for (int i = 0; i <= last_index; i += 2) {
-        printf("%d %d ", solucao[i], solucao[i + 1]);
+        if (solucao[i] != -1){
+            printf("%d %d ", solucao[i], solucao[i + 1]);
+        }
     }
     free(solucao);
     printf("\b\n");

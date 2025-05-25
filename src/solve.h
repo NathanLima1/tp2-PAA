@@ -17,4 +17,5 @@ Dp *dp_init(int profundidade, int num_vertices, int capacidade);
 void calc(Dp *dp, int *w, int *v, int **g);
 int **init_graph(int num_vertices);
 void add_conn(int **graph, int id1, int id2, int dist);
-void reconstruir(Dp *dp);
+void reconstruir(Dp *dp); // Reconstrói a solução com base na matriz da DP
+void minimizar_solucao(int *solucao, int n); // Remove os ciclos redundantes da solução
