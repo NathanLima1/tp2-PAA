@@ -48,10 +48,10 @@ void calc(Dp *dp, int *w, int *v, int **g) {
             for (int capacidade = 0; capacidade <= dp->capacidade; capacidade++) {
                 for (int u = 1; u <= dp->vertice; u++) {
 
-                    // Para todos os vizinhos alcançáveis de vertice e ele mesmo
+                    // Para todos os vizinhos alcançáveis de vertice e ele mesmo, se a distância for 0
                     int d = g[u - 1][vertice - 1];
-                    if (d == -1 || dist - d < 0) continue;
-                    for (int l = 0; l <= capacidade / w_atual; l++) {
+                    if ((d == 0 && dist) || d == -1 || dist - d < 0) continue; // Se a distância não for 0, o vértice atual não precisa ser atualizado para si mesmo
+                    for (int l = 0; l <= (capacidade / w_atual); l++) {
                         int prev_c = capacidade - l * w_atual;
                         int new_v = dp->data[dist - d][u][prev_c].value + l * v_atual;
                         if (dp->data[dist][vertice][capacidade].value <= new_v) {
@@ -74,7 +74,9 @@ int **init_graph(int n) {
         graph[i] = (int *)malloc(n * sizeof(int));
         for (int j = 0; j < n; j++) {
             graph[i][j] = -1;
-            if (i == j) graph[i][j] = 0;
+            if (i == j) {
+                graph[i][j] = 0;
+            }
         }
     }
     return graph;
@@ -85,70 +87,82 @@ void add_conn(int **graph, int id1, int id2, int dist) {
     graph[id2][id1] = dist;
 }
 
-void reconstruir(Dp *dp) {
+void reconstruir(Dp *dp, int **g, int *w) {
     DpItem *atual;
-    int max_v = 0;
+    int max_v = 1;
     int i;
     for (i = 1; i <= dp->vertice; i++) {
         atual = &dp->data[dp->dist][i][dp->capacidade];
-        if (atual->value > dp->data[dp->dist][max_v][dp->capacidade].value) {
+        if (atual->value > dp->data[dp->dist][max_v][dp->capacidade].value && atual->q) {
             max_v = i;
         }
     }
+    int x;
+    max_v = dp->vertice;
     atual = &dp->data[dp->dist][max_v][dp->capacidade];
     printf("%d ", atual->value);
     int v = max_v;
     int dist = dp->dist;
     int capacidade = dp->capacidade;
+    int d = 0;
     while (1) {
-        printf("%d %d ", v, atual->q);
-        capacidade = atual->prev_c;
-        v = atual->prev;
-        atual = &dp->data[dist][v][capacidade];
-        
-        if (v == atual->prev && atual->prev_c == capacidade) {
+        if (d > dp->dist) {
             break;
         }
+        d += g[v - 1][atual->prev - 1];
+        printf("%d %d ", v, atual->q);
+        capacidade = atual->prev_c;
+
+        
+        v = atual->prev;
+        atual = &dp->data[dist][v][capacidade];
     }
 
     printf("\b\n");
 }
 int main() {
     
-    // int **g = init_graph(6);
-    // int v[] = {2, 3, 7, 4, 3, 1};
-    // int w[] = {70, 100, 20, 90, 20, 10};
-    // int num_vertices = 6;
-    // int max_depth = 10;
-    // int capacidade = 310;
-
-    // add_conn(g, 0, 1, 3);
-    // add_conn(g, 0, 4, 2);
-    // add_conn(g, 1, 2, 4);
-    // add_conn(g, 1, 3, 2);
-    // add_conn(g, 2, 5, 3);
-    // add_conn(g, 3, 4, 3);
-    // add_conn(g, 3, 5, 5);
-
-    
-    
-    int **g = init_graph(5);
-    int v[] = {10, 9, 1, 6, 4};
-    int w[] = {10, 30, 1, 3, 2};
-    int num_vertices = 5;
-    int max_depth = 6;
-    int capacidade = 317;
+    int **g = init_graph(6);
+    int v[] = {2, 3, 7, 4, 3, 1};
+    int w[] = {70, 100, 20, 90, 20, 10};
+    int num_vertices = 6;
+    int max_depth = 10;
+    int capacidade = 310;
 
     add_conn(g, 0, 1, 3);
-    add_conn(g, 0, 2, 2);
-    add_conn(g, 0, 3, 2);
-    add_conn(g, 1, 2, 1);
-    add_conn(g, 2, 4, 3);
-    add_conn(g, 3, 4, 4);
+    add_conn(g, 0, 4, 2);
+    add_conn(g, 1, 2, 4);
+    add_conn(g, 1, 3, 2);
+    add_conn(g, 2, 5, 3);
+    add_conn(g, 3, 4, 3);
+    add_conn(g, 3, 5, 5);
+
+    
+    
+    // int **g = init_graph(5);
+    // int v[] = {10, 9, 1, 6, 4};
+    // int w[] = {10, 30, 1, 3, 2};
+    // int num_vertices = 5;
+    // int max_depth = 6;
+    // int capacidade = 317;
+
+    // add_conn(g, 0, 1, 3);
+    // add_conn(g, 0, 2, 2);
+    // add_conn(g, 0, 3, 2);
+    // add_conn(g, 1, 2, 1);
+    // add_conn(g, 2, 4, 3);
+    // add_conn(g, 3, 4, 4);
 
     Dp *dp = dp_init(max_depth, num_vertices, capacidade);
     calc(dp, w, v, g);
 
-    reconstruir(dp);
+    for (int i = 1; i <= dp->vertice; i++) {
+        DpItem *atual = &dp->data[dp->dist][i][dp->capacidade];
+        printf("Vertice %d: (%d, %d) %d\n", i, atual->q, atual->prev_c, atual->value);
+    }
+    // DpItem *atual = &dp->data[10][6][310];
+    // printf("%d %d\n", atual->prev, atual->prev_c);
+    // return 0;
+    reconstruir(dp, g, w);
     return 0;
 }
