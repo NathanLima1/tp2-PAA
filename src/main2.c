@@ -88,8 +88,6 @@ int main(int argc, char *argv[]){
 
             pesos[pi - 1] = wi;
             valores[pi - 1] = hi;
-
-            // add_town(graph, pi, wi, hi);
         }
 
         for(int i = 0; i < c; i++){
@@ -97,21 +95,12 @@ int main(int argc, char *argv[]){
                 printf("Erro ao ler o arquivo\n");
                 exit(1);
             }
-            add_conn(pi - 1, pj - 1, di);
-            // add_edge(graph, pi, pj, di);
+            add_conn(g, pi - 1, pj - 1, di);
         }
 
-        // prepare_adjacency(graph);
-        // solve_bf(graph, d, w);
-        // print_solution();
-
-        Dp *dp = dp_init(max_depth, num_vertices, capacidade)
+        Dp *dp = dp_init(max_depth, num_vertices, capacidade);
         calc(dp, pesos, valores, g);
-        reconstruir(dp, g, pesos);
-
-        free_graph(graph);
-        free_adjacency();
-        reset_globals();
+        reconstruir(dp);
         k--;
     }
     
