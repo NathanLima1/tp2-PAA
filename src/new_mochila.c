@@ -4,6 +4,7 @@ typedef struct {
     int value;
     int q; // quantidade
     int prev_c; // quantidade anterior
+    int prev_d;
     int prev; // Vértice anterior
 } DpItem;
 
@@ -33,6 +34,7 @@ Dp *dp_init(int n, int num_vertices, int m) {
                 dp->data[i][j][k].q = 0;
                 dp->data[i][j][k].prev_c = 0;
                 dp->data[i][j][k].prev = 0;
+                dp->data[i][j][k].prev_d = 0;
 
             }
         }
@@ -46,13 +48,16 @@ void calc(Dp *dp, int *w, int *v, int **g) {
             int w_atual = w[vertice - 1];
             int v_atual = v[vertice - 1];
             for (int capacidade = 0; capacidade <= dp->capacidade; capacidade++) {
-                // Atualiza os valores para evitar colunas vazias em distâncias impossíveis pelo grafo
+                // Atualiza os valores para evitar colunas[Vet:Cap] vazias na matriz em distâncias impossíveis pelo grafo
+                // Exemplo para o vértice 3 no caso de teste, é impossível ter uma distância de 1, pois o vértice mais próximo está a 3
+                // Então a menor distância maior do q 0 seria 3, deixando as colunas 0, 1 e 2 sem atualização
                 int l = capacidade / w_atual;
                 int new_v = l * v_atual;
                 dp->data[dist][vertice][capacidade].value = new_v;
                 dp->data[dist][vertice][capacidade].q = l;
                 dp->data[dist][vertice][capacidade].prev_c = capacidade - new_v;
                 dp->data[dist][vertice][capacidade].prev = vertice;
+                dp->data[dist][vertice][capacidade].prev_d = dist;
 
                 for (int u = 1; u <= dp->vertice; u++) {
                     
@@ -67,6 +72,7 @@ void calc(Dp *dp, int *w, int *v, int **g) {
                             dp->data[dist][vertice][capacidade].q = l;
                             dp->data[dist][vertice][capacidade].prev_c = prev_c;
                             dp->data[dist][vertice][capacidade].prev = u;
+                            dp->data[dist][vertice][capacidade].prev_d = dist - d;
                         }
                     }
                 }
@@ -102,8 +108,6 @@ void reconstruir(Dp *dp, int **g, int *w) {
             max_v = i;
         }
     }
-    int x;
-    max_v = dp->vertice;
     atual = &dp->data[dp->dist][max_v][dp->capacidade];
     printf("%d ", atual->value);
     int v = max_v;
@@ -111,14 +115,14 @@ void reconstruir(Dp *dp, int **g, int *w) {
     int capacidade = dp->capacidade;
     int d = 0;
     while (1) {
-        if (d > dp->dist) {
-            break;
-        }
-        d += g[v - 1][atual->prev - 1];
+
         printf("%d %d ", v, atual->q);
+        dist = atual->prev_d;
         capacidade = atual->prev_c;
 
-        
+        if (v == atual->prev) {
+            break;
+        }
         v = atual->prev;
         atual = &dp->data[dist][v][capacidade];
     }
@@ -161,9 +165,10 @@ int main() {
     Dp *dp = dp_init(max_depth, num_vertices, capacidade);
     calc(dp, w, v, g);
     for (int i = 1; i <= dp->vertice; i++) {
-        DpItem *atual = &dp->data[6][i][dp->capacidade];
-        printf("Vertice %d: (%d, %d) %d\n", i, atual->q, atual->prev_c, atual->value);
+        DpItem *atual = &dp->data[6][i][10];
+        printf("Vertice %d: v: %d (q: %d, c: %d) %d, %d\n", i, atual->prev, atual->q, atual->prev_c, atual->value, atual->prev_d);
     }
+
     reconstruir(dp, g, w);
     return 0;
 }
