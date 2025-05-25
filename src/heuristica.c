@@ -1,9 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "solve.h"
-
-
-
+#include "heuristica.h"
 
 int get_max(Graph *g, int capacidade, int viz, int toggle) {
     int max = -1;
@@ -19,44 +16,25 @@ int get_max(Graph *g, int capacidade, int viz, int toggle) {
     return max;
 }
 
-int main() {
-    Graph *g = init_graph(6);
-    int v[] = {2, 3, 7, 4, 3, 1};
-    int w[] = {70, 100, 20, 90, 20, 10};
-    for (int i = 0; i < 6; i++) {
-        g->towns[i].v = v[i];
-        g->towns[i].w = w[i];
-    }
 
-    int c[6] = {0, 0, 0, 0, 0, 0};
-    int n = 6;
-    int distancia = 10;
-    int capacidade = 310;
+void heuristica(Graph *g, int max_depth, int capacidade) {
     int habilidade = 0;
 
-    add_conn(g, 0, 1, 3);
-    add_conn(g, 0, 4, 2);
-    add_conn(g, 1, 2, 4);
-    add_conn(g, 1, 3, 2);
-    add_conn(g, 2, 5, 3);
-    add_conn(g, 3, 4, 3);
-    add_conn(g, 3, 5, 5);
-
-    int cabe = 1;
+    int *c = malloc(sizeof(int) * g->num_vertices);
     int i = get_max(g, capacidade, 0, 0);
     int prev_i = i;
-    int *solucao = malloc(sizeof(int) * distancia*2);
+    int *solucao = malloc(sizeof(int) * max_depth*2);
     int j = 0;
     while (1) {
-        c[i] = capacidade / w[i]; 
-        habilidade += c[i] * v[i];
-        capacidade -= c[i] * w[i];
-        v[i] = 0; // Deleta
+        c[i] = capacidade / g->towns[i].w; 
+        habilidade += c[i] * g->towns[i].v;
+        capacidade -= c[i] * g->towns[i].w;
+        g->towns[i].v = 0; // Deleta
 
         solucao[j] = i+1;
         solucao[j+1] = c[i];
 
-        distancia -= g[i][prev_i];
+        max_depth -= g->data[i][prev_i];
         prev_i = i;
 
         // Maior vizinho
@@ -73,5 +51,7 @@ int main() {
         printf("%d %d ", solucao[i], solucao[i+1]);
     }
     printf("\n");
-    return 0;
+
+    free(c);
+    free(solucao);
 }

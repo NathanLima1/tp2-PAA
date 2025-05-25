@@ -1,3 +1,6 @@
+#ifndef SOLVE_H
+#define SOLVE_H
+
 typedef struct {
     int value;
     int q; // quantidade
@@ -30,3 +33,5 @@ Graph *init_graph(int num_vertices);
 void add_conn(Graph *graph, int id1, int id2, int dist);
 void reconstruir(Dp *dp); // Reconstrói a solução com base na matriz da DP
 void minimizar_solucao(int *solucao, int n); // Remove os ciclos redundantes da solução
+
+#endif
