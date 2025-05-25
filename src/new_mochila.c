@@ -87,17 +87,17 @@ void add_conn(int **graph, int id1, int id2, int dist) {
 
 void reconstruir(Dp *dp) {
     DpItem *atual;
-    DpItem *max = &dp->data[0][0][0];
+    int max_v = 0;
     int i;
     for (i = 1; i <= dp->vertice; i++) {
         atual = &dp->data[dp->dist][i][dp->capacidade];
-        if (atual->value > max->value) {
-            max = atual;
+        if (atual->value > dp->data[dp->dist][max_v][dp->capacidade].value) {
+            max_v = i;
         }
     }
-    atual = max;
+    atual = &dp->data[dp->dist][max_v][dp->capacidade];
     printf("%d ", atual->value);
-    int v = i;
+    int v = max_v;
     int dist = dp->dist;
     int capacidade = dp->capacidade;
     while (1) {
