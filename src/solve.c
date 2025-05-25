@@ -1,161 +1,134 @@
-#include "mochila.h"
+#include "solve.h"
+#include <stdlib.h>
+#include <stdio.h>
 
-typedef struct {
-    int id;
-    int dist;
-} neighbor;
+Dp *dp_init(int profundidade, int num_vertices, int capacidade) {
+    Dp *dp = (Dp*)malloc(sizeof(Dp));
+    dp->dist = profundidade;
+    dp->vertice = num_vertices;
+    dp->capacidade = capacidade;
+    profundidade++;
+    num_vertices++;
+    capacidade++;
+    dp->data = (DpItem***)malloc((profundidade) * sizeof(DpItem**));
+    for (int i = 0; i < profundidade; i++) {
+        dp->data[i] = (DpItem**)malloc(num_vertices * sizeof(DpItem*));
+        for (int j = 0; j < num_vertices; j++) {
+            dp->data[i][j] = (DpItem*)malloc(capacidade * sizeof(DpItem));
 
-typedef struct town{
-    int id;
-    int weight;
-    int skill;
+            for (int k = 0; k < capacidade; k++) {
+                dp->data[i][j][k].value = 0;
+                dp->data[i][j][k].q = 0;
+                dp->data[i][j][k].prev_c = 0;
+                dp->data[i][j][k].prev = 0;
+                dp->data[i][j][k].prev_d = 0;
+            }
 
-    neighbor *neighbors;
-    int num_neighbors;
-    int size;
-    int visitado; // Posso retroceder apenas em vizinhos que já foram visitados
-}Town;
-
-typedef struct graph
-{
-    int size;
-    Town** towns;
-}Graph;
-
-Town *create_town(int id, int weight, int skill){
-    Town *town = (Town*)malloc(sizeof(Town));
-    town->id = id;
-    town->weight = weight;
-    town->skill = skill;
-
-    town->num_neighbors = 0;
-    town->size = 1;
-    town->neighbors = malloc(sizeof(neighbor));
-
-    town->visitado = 0;
-    return town;
+        }
+    }
+    return dp;
 }
-Graph *create_graph(int num_towns){
-    Graph *graph = (Graph*)malloc(sizeof(Graph));
-    graph->size = num_towns;
-    graph->towns = (Town**)malloc(num_towns * sizeof(Town*));
-    for(int i = 0; i < num_towns; i++){
-        graph->towns[i] = create_town(i, 0, 0);
+
+void calc(Dp *dp, int *w, int *v, int **g) {
+    for (int dist = 0; dist <= dp->dist; dist++) {
+        for (int vertice = 1; vertice <= dp->vertice; vertice++) {
+            int w_atual = w[vertice - 1];
+            int v_atual = v[vertice - 1];
+            for (int capacidade = 0; capacidade <= dp->capacidade; capacidade++) {
+                // Atualiza os valores para evitar colunas[Vet:Cap] vazias na matriz em distâncias impossíveis pelo grafo
+                // Exemplo para o vértice 3 no caso de teste, é impossível ter uma distância de 1, pois o vértice mais próximo está a 3
+                // Então a menor distância maior do q 0 seria 3, deixando as colunas 0, 1 e 2 sem atualização
+                int l = capacidade / w_atual;
+                int new_v = l * v_atual;
+                dp->data[dist][vertice][capacidade].value = new_v;
+                dp->data[dist][vertice][capacidade].q = l;
+                dp->data[dist][vertice][capacidade].prev_c = capacidade - new_v;
+                dp->data[dist][vertice][capacidade].prev = vertice;
+                dp->data[dist][vertice][capacidade].prev_d = dist;
+
+                for (int u = 1; u <= dp->vertice; u++) {
+                    
+                    // Para todos os vizinhos alcançáveis
+                    int d = g[u - 1][vertice - 1];
+                    if (d == 0 || dist - d < 0) continue;
+                    for (int l = 0; l <= (capacidade / w_atual); l++) {
+                        int prev_c = capacidade - l * w_atual;
+                        int new_v = dp->data[dist - d][u][prev_c].value + l * v_atual;
+                        if (dp->data[dist][vertice][capacidade].value <= new_v) {
+                            dp->data[dist][vertice][capacidade].value = new_v;
+                            dp->data[dist][vertice][capacidade].q = l;
+                            dp->data[dist][vertice][capacidade].prev_c = prev_c;
+                            dp->data[dist][vertice][capacidade].prev = u;
+                            dp->data[dist][vertice][capacidade].prev_d = dist - d;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+int **init_graph(int num_vertices) {
+    int **graph = (int **)malloc(num_vertices * sizeof(int *));
+    for (int i = 0; i < num_vertices; i++) {
+        graph[i] = (int *)malloc(num_vertices * sizeof(int));
+        for (int j = 0; j < num_vertices; j++) {
+            graph[i][j] = 0;
+        }
     }
     return graph;
 }
 
-void add_conn(Graph *graph, int id1, int id2, int dist){
-    neighbor n1 = {id1, dist};
-    neighbor n2 = {id2, dist};
-
-    Town *town1 = graph->towns[id1];
-    Town *town2 = graph->towns[id2];
-
-    
-    town1->neighbors[town1->num_neighbors] = n2;
-    town2->neighbors[town2->num_neighbors] = n1;
-
-    town1->num_neighbors++;
-    town2->num_neighbors++;
-
-    if (town1->num_neighbors == town1->size){
-        town1->size *= 2;
-        town1->neighbors = realloc(town1->neighbors, (town1->size) * sizeof(neighbor));
-    }
-    if (town2->num_neighbors == town2->size){
-        town2->size *= 2;
-        town2->neighbors = realloc(town2->neighbors, (town2->size) * sizeof(neighbor));
-    }
-
-
+void add_conn(int **graph, int id1, int id2, int dist) {
+    graph[id1][id2] = dist;
+    graph[id2][id1] = dist;
 }
 
-void reset_graph(Graph *graph){
-    for(int i = 0; i < graph->size; i++){
-        graph->towns[i]->visitado = 0;
-    }
-}
-
-void free_graph(Graph *graph){
-    for(int i = 0; i < graph->size; i++){
-        free(graph->towns[i]->neighbors);
-        free(graph->towns[i]);
-    }
-
-    free(graph->towns);
-    free(graph);
-}
-
-void copy_dp(Dp *dp1, Dp *dp2){
-    dp2->h = dp1->h;
-    dp2->m = dp1->m;
-    dp2->n = dp1->n;
-
-    for (int i = 0; i <= dp2->n; i++) {
-        dp2->line_weight[i] = dp1->line_weight[i];
-        dp2->line_v[i] = dp1->line_v[i];
-        for (int j = 0; j <= dp2->m; j++) {
-            dp2->data[i][j].value = dp1->data[i][j].value;
-            dp2->data[i][j].q = dp1->data[i][j].q;
-            dp2->data[i][j].prev_q = dp1->data[i][j].prev_q;
+void reconstruir(Dp *dp) {
+    DpItem *atual;
+    int max_v = 1;
+    int max_value = 0;
+    int i;
+    for (i = 1; i <= dp->vertice; i++) {
+        atual = &dp->data[dp->dist][i][dp->capacidade];
+        // Dá prioridade para vértices em que q soldados foram escolhidos
+        if ((atual->q && atual->value >= max_value) || atual->value > max_value) {
+            max_value = atual->value;
+            max_v = i;
         }
     }
-}
-void dfs(Graph *g, int start, int depth, Dp *dp, Dp *max_dp) {
-    Town *atual = g->towns[start];
+    atual = &dp->data[dp->dist][max_v][dp->capacidade];
+    printf("%d ", atual->value);
+    int v = max_v;
+    int dist = dp->dist;
+    int capacidade = dp->capacidade;
 
-    if (!atual->visitado) iter(dp, atual->weight, atual->skill);
-    int atual_visitado = atual->visitado;
-    atual->visitado = 1;
+    while (1) {
 
-    int nao_tem_vizinho = 1;
-    for(int i = 0; i < atual->num_neighbors; i++) {
-        int id = atual->neighbors[i].id;
-        int visitado = g->towns[id]->visitado;
+        printf("%d %d ", v, atual->q);
+        dist = atual->prev_d;
 
-        // Visita avançando ou retrocedendo nos visitados, para permitir o retorno e acesso simultâneo a bifurcações
-        // Avança apenas para ids maiores e retrocede para os menores
-        if ((!visitado && start < id) || (visitado && start > id)) {
-            int new_depth = depth - atual->neighbors[i].dist;
+        capacidade = atual->prev_c;
 
-            if (new_depth >= 0) {
-                nao_tem_vizinho = 0;
-                dfs(g, id, new_depth, dp, max_dp);
-            }
-            }
+        // Se repetir um vértice ou não houver mais capacidade, pode parar
+        if (v == atual->prev || !dist || !capacidade) {
+            break;
         }
-        if (nao_tem_vizinho) {
-            if (dp->data[dp->h][dp->m].value > max_dp->data[max_dp->h][max_dp->m].value) {
-                copy_dp(dp, max_dp);
-            }
+        v = atual->prev;
+        atual = &dp->data[dist][v][capacidade];
     }
-    if (!atual_visitado) {
-        atual->visitado = 0;
-        undo(dp);
-    }
+    printf("\b\n");
 }
-
-typedef struct {
-    Dp *dp;
-} DpGrafoItem;
-
-typedef struct {
-    DpGrafoItem *data;
-} DpGrafo;
-
 int main() {
-    Graph *g = create_graph(6);
+    
+    int **g = init_graph(6);
     int v[] = {2, 3, 7, 4, 3, 1};
     int w[] = {70, 100, 20, 90, 20, 10};
-    int n = 6;
-    int max_depth = 10;
-    int m = 310;
+    int num_vertices = 6;
+    int profundidade = 10;
+    int capacidade = 310;
 
-    for (int i = 0; i < n; i++){
-        g->towns[i]->weight = w[i];
-        g->towns[i]->skill = v[i];
-    }
     add_conn(g, 0, 1, 3);
     add_conn(g, 0, 4, 2);
     add_conn(g, 1, 2, 4);
@@ -164,19 +137,24 @@ int main() {
     add_conn(g, 3, 4, 3);
     add_conn(g, 3, 5, 5);
 
-    Dp *dp = dp_init(n, m);
-    Dp *max_dp = dp_init(n, m);
+    
+    
+    // int **g = init_graph(5);
+    // int v[] = {10, 9, 1, 6, 4};
+    // int w[] = {10, 30, 1, 3, 2};
+    // int num_vertices = 5;
+    // int profundidade = 6;
+    // int capacidade = 317;
 
-    // O algoritmo inicia aqui
-    for(int i = 0; i < n; i++){
-        dfs(g, i, max_depth, dp, max_dp);
-        reset_graph(g);
-    };
+    // add_conn(g, 0, 1, 3);
+    // add_conn(g, 0, 2, 2);
+    // add_conn(g, 0, 3, 2);
+    // add_conn(g, 1, 2, 1);
+    // add_conn(g, 2, 4, 3);
+    // add_conn(g, 3, 4, 4);
 
-    show(max_dp, w, v);
-
-    free_graph(g);
-    free_dp(dp);
-    free_dp(max_dp);
+    Dp *dp = dp_init(profundidade, num_vertices, capacidade);
+    calc(dp, w, v, g);
+    reconstruir(dp);
     return 0;
 }
