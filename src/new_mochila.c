@@ -101,10 +101,13 @@ void add_conn(int **graph, int id1, int id2, int dist) {
 void reconstruir(Dp *dp, int **g, int *w) {
     DpItem *atual;
     int max_v = 1;
+    int max_value = 0;
     int i;
     for (i = 1; i <= dp->vertice; i++) {
         atual = &dp->data[dp->dist][i][dp->capacidade];
-        if (atual->value > dp->data[dp->dist][max_v][dp->capacidade].value && atual->q) {
+        // Dá prioridade para vértices em que q soldados foram escolhidos
+        if ((atual->q && atual->value >= max_value) || atual->value > max_value) {
+            max_value = atual->value;
             max_v = i;
         }
     }
@@ -113,20 +116,22 @@ void reconstruir(Dp *dp, int **g, int *w) {
     int v = max_v;
     int dist = dp->dist;
     int capacidade = dp->capacidade;
+    int max_capacidade = atual->value;
     int d = 0;
     while (1) {
 
         printf("%d %d ", v, atual->q);
         dist = atual->prev_d;
+
         capacidade = atual->prev_c;
 
-        if (v == atual->prev) {
+        // Se repetir um vértice ou não houver mais capacidade, pode parar
+        if (v == atual->prev || !dist || !capacidade) {
             break;
         }
         v = atual->prev;
         atual = &dp->data[dist][v][capacidade];
     }
-
     printf("\b\n");
 }
 int main() {
@@ -165,7 +170,7 @@ int main() {
     Dp *dp = dp_init(max_depth, num_vertices, capacidade);
     calc(dp, w, v, g);
     for (int i = 1; i <= dp->vertice; i++) {
-        DpItem *atual = &dp->data[6][i][10];
+        DpItem *atual = &dp->data[6][i][310];
         printf("Vertice %d: v: %d (q: %d, c: %d) %d, %d\n", i, atual->prev, atual->q, atual->prev_c, atual->value, atual->prev_d);
     }
 
