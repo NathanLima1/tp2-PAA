@@ -30,8 +30,8 @@ Dp *dp_init(int profundidade, int num_vertices, int capacidade) {
 }
 
 void free_dp(Dp *dp) {
-    for (int i = 0; i < dp->dist; i++) {
-        for (int j = 0; j < dp->vertice; j++) {
+    for (int i = 0; i <= dp->dist; i++) {
+        for (int j = 0; j <= dp->vertice; j++) {
             free(dp->data[i][j]);
         }
         free(dp->data[i]);

@@ -9,9 +9,6 @@
 #include "solve.h"
 #include "heuristica.h"
 
-void programacao_dinamica() {
-}
-
 int main(int argc, char *argv[]){
     FILE *fp = stdin;
     FILE *fp_out = stdin;
