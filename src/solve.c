@@ -3,7 +3,6 @@
 typedef struct {
     int id;
     int dist;
-    int visited;
 } neighbor;
 
 typedef struct town{
@@ -13,7 +12,8 @@ typedef struct town{
 
     neighbor *neighbors;
     int num_neighbors;
-    int descendente; // Posso retroceder apenas em vizinhos que já foram visitados
+    int size;
+    int visitado; // Posso retroceder apenas em vizinhos que já foram visitados
 }Town;
 
 typedef struct graph
@@ -27,9 +27,12 @@ Town *create_town(int id, int weight, int skill){
     town->id = id;
     town->weight = weight;
     town->skill = skill;
+
     town->num_neighbors = 0;
+    town->size = 1;
     town->neighbors = malloc(sizeof(neighbor));
-    town->descendente = 0;
+
+    town->visitado = 0;
     return town;
 }
 Graph *create_graph(int num_towns){
@@ -43,26 +46,34 @@ Graph *create_graph(int num_towns){
 }
 
 void add_conn(Graph *graph, int id1, int id2, int dist){
-    neighbor n1 = {id1, dist, 0};
-    neighbor n2 = {id2, dist, 0};
+    neighbor n1 = {id1, dist};
+    neighbor n2 = {id2, dist};
 
     Town *town1 = graph->towns[id1];
     Town *town2 = graph->towns[id2];
+
+    
     town1->neighbors[town1->num_neighbors] = n2;
     town2->neighbors[town2->num_neighbors] = n1;
 
     town1->num_neighbors++;
     town2->num_neighbors++;
-    town1->neighbors = realloc(town1->neighbors, (town1->num_neighbors + 1) * sizeof(neighbor));
-    town2->neighbors = realloc(town2->neighbors, (town2->num_neighbors + 1) * sizeof(neighbor));
+
+    if (town1->num_neighbors == town1->size){
+        town1->size *= 2;
+        town1->neighbors = realloc(town1->neighbors, (town1->size) * sizeof(neighbor));
+    }
+    if (town2->num_neighbors == town2->size){
+        town2->size *= 2;
+        town2->neighbors = realloc(town2->neighbors, (town2->size) * sizeof(neighbor));
+    }
+
+
 }
 
 void reset_graph(Graph *graph){
     for(int i = 0; i < graph->size; i++){
-        for (int j = 0; j < graph->towns[i]->num_neighbors; j++){
-            graph->towns[i]->neighbors[j].visited = 0;
-        }
-        graph->towns[i]->descendente = 0;
+        graph->towns[i]->visitado = 0;
     }
 }
 
@@ -76,53 +87,62 @@ void free_graph(Graph *graph){
     free(graph);
 }
 
+void copy_dp(Dp *dp1, Dp *dp2){
+    dp2->h = dp1->h;
+    dp2->m = dp1->m;
+    dp2->n = dp1->n;
+
+    for (int i = 0; i <= dp2->n; i++) {
+        dp2->line_weight[i] = dp1->line_weight[i];
+        dp2->line_v[i] = dp1->line_v[i];
+        for (int j = 0; j <= dp2->m; j++) {
+            dp2->data[i][j].value = dp1->data[i][j].value;
+            dp2->data[i][j].q = dp1->data[i][j].q;
+            dp2->data[i][j].prev_q = dp1->data[i][j].prev_q;
+        }
+    }
+}
 void dfs(Graph *g, int start, int depth, Dp *dp, Dp *max_dp) {
     Town *atual = g->towns[start];
 
-    if (!atual->descendente) {
-        iter(dp, atual->weight, atual->skill);
-    }
-    int bak_descendente = atual->descendente;
-    atual->descendente = 1;
+    if (!atual->visitado) iter(dp, atual->weight, atual->skill);
+    int atual_visitado = atual->visitado;
+    atual->visitado = 1;
 
+    int nao_tem_vizinho = 1;
     for(int i = 0; i < atual->num_neighbors; i++) {
         int id = atual->neighbors[i].id;
-        if(!atual->neighbors[i].visited) {
-            atual->neighbors[i].visited = 1;
+        int visitado = g->towns[id]->visitado;
 
+        // Visita avançando ou retrocedendo nos visitados, para permitir o retorno e acesso simultâneo a bifurcações
+        // Avança apenas para ids maiores e retrocede para os menores
+        if ((!visitado && start < id) || (visitado && start > id)) {
             int new_depth = depth - atual->neighbors[i].dist;
-            int descendente = g->towns[id]->descendente;
 
-            if ((!descendente && start < id) || (descendente && start > id)) {
-                if (new_depth >= 0) {
-                    dfs(g, id, new_depth, dp, max_dp);
-                } else {
-                    if (dp->data[dp->h][dp->m].value > max_dp->data[max_dp->h][max_dp->m].value) {
-                        max_dp->h = dp->h;
-                    
-                        // Copia os dados do dp atual para o max_dp
-                        for (int i = 0; i <= max_dp->n; i++) {
-                            max_dp->line_weight[i] = dp->line_weight[i];
-                            max_dp->line_v[i] = dp->line_v[i];
-                            for (int j = 0; j <= max_dp->m; j++) {
-                                max_dp->data[i][j].value = dp->data[i][j].value;
-                                max_dp->data[i][j].q = dp->data[i][j].q;
-                                max_dp->data[i][j].prev_q = dp->data[i][j].prev_q;
-                            }
-                        }
-                    }
-                
-                }
+            if (new_depth >= 0) {
+                nao_tem_vizinho = 0;
+                dfs(g, id, new_depth, dp, max_dp);
             }
-
-            atual->neighbors[i].visited = 0;
+            }
         }
+        if (nao_tem_vizinho) {
+            if (dp->data[dp->h][dp->m].value > max_dp->data[max_dp->h][max_dp->m].value) {
+                copy_dp(dp, max_dp);
+            }
     }
-    if (!bak_descendente) {
-        atual->descendente = 0;
+    if (!atual_visitado) {
+        atual->visitado = 0;
         undo(dp);
     }
 }
+
+typedef struct {
+    Dp *dp;
+} DpGrafoItem;
+
+typedef struct {
+    DpGrafoItem *data;
+} DpGrafo;
 
 int main() {
     Graph *g = create_graph(6);
