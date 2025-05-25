@@ -99,7 +99,7 @@ void reconstruir(int **g, Dp *dp) {
     int v = i;
     int dist = dp->dist;
     int capacidade = dp->capacidade;
-    while (atual->q) {
+    while (capacidade) {
         printf("%d %d\n", v, atual->q);
         capacidade = atual->prev_c;
         v = atual->prev;
