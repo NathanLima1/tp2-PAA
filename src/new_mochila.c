@@ -85,23 +85,23 @@ void add_conn(int **graph, int id1, int id2, int dist) {
     graph[id2][id1] = dist;
 }
 
-void reconstruir(int **g, Dp *dp) {
+void reconstruir(Dp *dp) {
     DpItem *atual;
+    DpItem *max = &dp->data[0][0][0];
     int i;
     for (i = 1; i <= dp->vertice; i++) {
         atual = &dp->data[dp->dist][i][dp->capacidade];
-        if (atual->q > 0) {
-            break;
+        if (atual->value > max->value) {
+            max = atual;
         }
     }
-
-    printf("Valor total: %d\n", atual->value);
+    atual = max;
+    printf("%d ", atual->value);
     int v = i;
     int dist = dp->dist;
     int capacidade = dp->capacidade;
     while (1) {
-        printf("%d %d\n", v, atual->q);
-        dist -= g[v - 1][atual->prev - 1];
+        printf("%d %d ", v, atual->q);
         capacidade = atual->prev_c;
         v = atual->prev;
         atual = &dp->data[dist][v][capacidade];
@@ -110,27 +110,45 @@ void reconstruir(int **g, Dp *dp) {
             break;
         }
     }
+
+    printf("\b\n");
 }
 int main() {
     
-    int **g = init_graph(6);
-    int v[] = {2, 3, 7, 4, 3, 1};
-    int w[] = {70, 100, 35, 90, 20, 10};
-    int num_vertices = 6;
-    int max_depth = 10;
-    int capacidade = 310;
+    // int **g = init_graph(6);
+    // int v[] = {2, 3, 7, 4, 3, 1};
+    // int w[] = {70, 100, 20, 90, 20, 10};
+    // int num_vertices = 6;
+    // int max_depth = 10;
+    // int capacidade = 310;
+
+    // add_conn(g, 0, 1, 3);
+    // add_conn(g, 0, 4, 2);
+    // add_conn(g, 1, 2, 4);
+    // add_conn(g, 1, 3, 2);
+    // add_conn(g, 2, 5, 3);
+    // add_conn(g, 3, 4, 3);
+    // add_conn(g, 3, 5, 5);
+
+    
+    
+    int **g = init_graph(5);
+    int v[] = {10, 9, 1, 6, 4};
+    int w[] = {10, 30, 1, 3, 2};
+    int num_vertices = 5;
+    int max_depth = 6;
+    int capacidade = 317;
 
     add_conn(g, 0, 1, 3);
-    add_conn(g, 0, 4, 2);
-    add_conn(g, 1, 2, 4);
-    add_conn(g, 1, 3, 2);
-    add_conn(g, 2, 5, 3);
-    add_conn(g, 3, 4, 3);
-    add_conn(g, 3, 5, 5);
+    add_conn(g, 0, 2, 2);
+    add_conn(g, 0, 3, 2);
+    add_conn(g, 1, 2, 1);
+    add_conn(g, 2, 4, 3);
+    add_conn(g, 3, 4, 4);
 
     Dp *dp = dp_init(max_depth, num_vertices, capacidade);
     calc(dp, w, v, g);
 
-    reconstruir(g, dp);
+    reconstruir(dp);
     return 0;
 }
