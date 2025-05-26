@@ -20,28 +20,29 @@ int get_max(Graph *g, int capacidade, int viz, int toggle) {
 void heuristica(Graph *g, int max_depth, int capacidade) {
     int habilidade = 0;
 
-    int *c = malloc(sizeof(int) * g->num_vertices);
     int i = get_max(g, capacidade, 0, 0);
     int prev_i = i;
     int *solucao = malloc(sizeof(int) * max_depth*2);
     int j = 0;
+    int q = 0;
     while (1) {
-        c[i] = capacidade / g->towns[i].w; 
-        habilidade += c[i] * g->towns[i].v;
-        capacidade -= c[i] * g->towns[i].w;
+        q = capacidade / g->towns[i].w; 
+        habilidade += q * g->towns[i].v;
+        capacidade -= q * g->towns[i].w;
         g->towns[i].v = 0; // Deleta
+        max_depth -= g->data[i][prev_i];
+
+
+        if (capacidade < 0 || max_depth < 0) break;
 
         solucao[j] = i+1;
-        solucao[j+1] = c[i];
+        solucao[j+1] = q;
 
-        max_depth -= g->data[i][prev_i];
         prev_i = i;
 
         // Maior vizinho
         i = get_max(g, capacidade, prev_i, 1);
-        if (i == -1 || capacidade < 0) {
-            break;
-        }
+        if (i == -1) break;
         j += 2;
     }
 
@@ -52,6 +53,5 @@ void heuristica(Graph *g, int max_depth, int capacidade) {
     }
     printf("\n");
 
-    free(c);
     free(solucao);
 }

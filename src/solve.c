@@ -46,21 +46,23 @@ void calc(Dp *dp, Graph *g) {
             int w_atual = g->towns[vertice - 1].w;
             int v_atual = g->towns[vertice - 1].v;
             for (int capacidade = 0; capacidade <= dp->capacidade; capacidade++) {
-                // Atualiza os valores para evitar colunas[Vet:Cap] vazias na matriz em distâncias impossíveis pelo grafo
+                // Atualiza os valores para evitar colunas[_:vet:cap] vazias na matriz em distâncias impossíveis pelo grafo
                 // Exemplo para o vértice 3 no caso de teste, é impossível ter uma distância de 1, pois o vértice mais próximo está a 3
-                // Então a menor distância maior do q 0 seria 3, deixando as colunas 0, 1 e 2 sem atualização
+                // Então a menor distância maior do que 0 seria 3, deixando as colunas 0, 1 e 2 sem atualização
                 int l = capacidade / w_atual;
                 int new_v = l * v_atual;
                 dp->data[dist][vertice][capacidade].value = new_v;
                 dp->data[dist][vertice][capacidade].q = l;
                 dp->data[dist][vertice][capacidade].prev_c = capacidade - new_v;
                 dp->data[dist][vertice][capacidade].prev = vertice;
-                dp->data[dist][vertice][capacidade].prev_d = dist;
+                dp->data[dist][vertice][capacidade].prev_d = dist > 0 ? dist - 1 : 0;
+
+
+                // Para todos os vizinhos alcançáveis
                 for (int u = 1; u <= dp->vertice; u++) {
-                    
-                    // Para todos os vizinhos alcançáveis
                     int d = g->data[u - 1][vertice - 1];
                     if (d == 0 || dist - d < 0) continue;
+
                     for (int l = 0; l <= (capacidade / w_atual); l++) {
                         int prev_c = capacidade - l * w_atual;
                         int new_v = dp->data[dist - d][u][prev_c].value + l * v_atual;
