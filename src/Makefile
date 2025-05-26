@@ -1,31 +1,26 @@
-CC = gcc
-CFLAGS = -Wall -O2 -I./src
-OBJDIR = obj
-LIBDIR = lib
-
 folders = obj
-OBJS = $(OBJDIR)/graph.o $(OBJDIR)/solve.o $(OBJDIR)/heuristica.o
-SRCS = src/main.c
+OBJS = $(folders)/graph.o $(folders)/solve.o $(folders)/heuristica.o
+SRCS = main.c
 
 TARGET = tp2
 
 all: $(TARGET)
 
 $(TARGET): $(folders) $(OBJS) $(SRCS)
-    $(CC) $(CFLAGS) -o $@ $(SRCS) $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $(SRCS) $(OBJS)
 
 $(folders):
-    mkdir -p $(folders)
+	mkdir -p $(folders)
 
-$(OBJDIR)/graph.o: src/graph.c src/graph.h
-    $(CC) $(CFLAGS) -c src/graph.c -o $@
+$(folders)/graph.o: graph.c graph.h
+	$(CC) $(CFLAGS) -c graph.c -o $@
 
-$(OBJDIR)/solve.o: src/solve.c src/solve.h src/graph.h
-    $(CC) $(CFLAGS) -c src/solve.c -o $@
+$(folders)/solve.o: solve.c solve.h graph.h
+	$(CC) $(CFLAGS) -c solve.c -o $@
 
-$(OBJDIR)/heuristica.o: src/heuristica.c src/heuristica.h src/solve.h src/graph.h
-    $(CC) $(CFLAGS) -c src/heuristica.c -o $@
+$(folders)/heuristica.o: heuristica.c heuristica.h solve.h graph.h
+	$(CC) $(CFLAGS) -c heuristica.c -o $@
 
 clean:
-    rm -f $(OBJDIR)/*.o $(TARGET)
-    rm -r $(folders)
+	rm -f $(folders)/*.o $(TARGET)
+	rm -r $(folders)
