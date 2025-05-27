@@ -12,8 +12,12 @@ typedef struct {
     Town *towns;
 } Graph;
 
-
+/* Incializa o grafo*/
 Graph *init_graph(int num_vertices);
+
+/* Adiciona a distancia para vertices conectados*/
 void add_conn(Graph *graph, int id1, int id2, int dist);
+
+/* Libera memoria armazenada para o grafo*/
 void free_graph(Graph *graph);
 #endif

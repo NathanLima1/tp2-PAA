@@ -1,5 +1,5 @@
 folders = obj
-OBJS = $(folders)/graph.o $(folders)/solve.o $(folders)/heuristica.o
+OBJS = $(folders)/graph.o $(folders)/dp.o $(folders)/heuristica.o
 SRCS = main.c
 
 TARGET = tp2
@@ -15,7 +15,7 @@ $(folders):
 $(folders)/graph.o: graph.c graph.h
 	$(CC) $(CFLAGS) -c graph.c -o $@
 
-$(folders)/solve.o: solve.c solve.h graph.h
+$(folders)/dp.o: dp.c solve.h graph.h
 	$(CC) $(CFLAGS) -c solve.c -o $@
 
 $(folders)/heuristica.o: heuristica.c heuristica.h solve.h graph.h

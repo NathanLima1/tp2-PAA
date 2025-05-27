@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "solve.h"
+#include "dp.h"
 
 Dp *dp_init(int profundidade, int num_vertices, int capacidade) {
     Dp *dp = (Dp*)malloc(sizeof(Dp));

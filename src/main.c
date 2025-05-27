@@ -6,7 +6,7 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <stdbool.h>
-#include "solve.h"
+#include "dp.h"
 #include "heuristica.h"
 
 int main(int argc, char *argv[]){
