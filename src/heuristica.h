@@ -1,7 +1,7 @@
 #ifndef HEURISTICA_H
 #define HEURISTICA_H
 
-#include "solve.h"
+#include "dp.h"
 
 /* Escolhe o vértice com maior razão como inicio do caminho para a heuristica*/
 int get_max_inicial(Graph *g, int capacidade);
