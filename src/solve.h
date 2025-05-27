@@ -21,7 +21,7 @@ typedef struct {
 Dp *dp_init(int profundidade, int num_vertices, int capacidade);
 void free_dp(Dp *dp);
 void calc(Dp *dp, Graph *g);
-void reconstruir(Dp *dp); // Reconstrói a solução com base na matriz da DP
+void reconstruir(Dp *dp, FILE* fp_out); // Reconstrói a solução com base na matriz da DP
 void minimizar_solucao(int *solucao, int n); // Remove os ciclos redundantes da solução
 
 #endif

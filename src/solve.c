@@ -107,7 +107,7 @@ void minimizar_solucao(int *solucao, int n) {
         }
     }
 }
-void reconstruir(Dp *dp) {
+void reconstruir(Dp *dp, FILE* fp_out) {
     DpItem *atual;
     int max_v = 1;
     int max_value = 0;
@@ -121,7 +121,7 @@ void reconstruir(Dp *dp) {
         }
     }
     atual = &dp->data[dp->dist][max_v][dp->capacidade];
-    printf("%d ", atual->value);
+    fprintf(fp_out, "%d ", atual->value);
     int v = max_v;
     int dist = dp->dist;
     int capacidade = dp->capacidade;
@@ -152,9 +152,9 @@ void reconstruir(Dp *dp) {
     minimizar_solucao(solucao, last_index);
     for (int i = 0; i <= last_index; i += 2) {
         if (solucao[i] != -1){
-            printf("%d %d ", solucao[i], solucao[i + 1]);
+            fprintf(fp_out, "%d %d ", solucao[i], solucao[i + 1]);
         }
     }
     free(solucao);
-    printf("\b\n");
+    //printf("\b\n");
 }

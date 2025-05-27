@@ -96,11 +96,12 @@ int main(int argc, char *argv[]){
         }
 
         if (option == 2) {
-            heuristica(g, max_depth, capacidade);
+            heuristica(g, max_depth, capacidade, fp_out);
         } else {
             Dp *dp = dp_init(max_depth, num_vertices, capacidade);
             calc(dp, g);
-            reconstruir(dp);
+            reconstruir(dp, fp_out);
+            fprintf(fp_out, "\n");
             free_dp(dp);
         }
         free_graph(g);
