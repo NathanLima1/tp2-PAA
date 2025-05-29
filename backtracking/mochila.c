@@ -106,3 +106,12 @@ void iter(Dp *dp, int w_atual, int v_atual, int vertice) {
 
     dp->h = i;
 }
+
+void print_dp(Dp *dp) {
+    for (int i = 0; i <= dp->n; i++) {
+        for (int j = 0; j <= dp->m; j++) {
+            printf("%d ", dp->data[i][j].value);
+        }
+        printf("\n");
+    }
+}

@@ -106,7 +106,6 @@ int main(int argc, char *argv[]){
 
             // O algoritmo inicia aqui
             for(int i = 0; i < num_vertices; i++){
-                g->towns[i]->is_root = 1;
                 dfs(g, i, max_depth, dp, max_dp);
                 reset_graph(g);
             };

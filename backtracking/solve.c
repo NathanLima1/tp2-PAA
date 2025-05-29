@@ -12,7 +12,6 @@ Town *create_town(int id, int w, int v){
     town->neighbors = malloc(sizeof(neighbor));
 
     town->visitado = 0;
-    town->is_root = 0;
     return town;
 }
 Graph *init_graph(int num_towns){
@@ -92,13 +91,12 @@ void dfs(Graph *g, int start, int depth, Dp *dp, Dp *max_dp) {
     for(int i = 0; i < atual->num_neighbors; i++) {
         int id = atual->neighbors[i].id;
         int visitado = atual->neighbors[i].visitado; // Visitado na aresta (direcionada) para permitir retorno
-        int is_root = g->towns[id]->is_root;
 
         if (!visitado) {
 
             int new_depth = depth - atual->neighbors[i].dist;
 
-            if (new_depth >= 0 && !is_root && !g->towns[id]->visitado) {
+            if (new_depth >= 0 && !g->towns[id]->visitado) {
                 nao_tem_vizinho = 0;
                 atual->neighbors[i].visitado = 1;
                 dfs(g, id, new_depth, dp, max_dp);
