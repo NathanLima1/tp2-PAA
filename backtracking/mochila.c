@@ -30,19 +30,13 @@ void free_dp(Dp *dp) {
     free(dp);
 }
 
-void show(Dp *dp, int *w, int *v) {
+void show(Dp *dp) {
     int max = dp->data[dp->h][dp->m].value;
     int idx = dp->m;
     printf("%d ", dp->data[dp->h][dp->m].value);
     for (int i = dp->h; i > 0; i--) {
-        max -= dp->data[i][idx].q * v[i-1];
-        
-        // printf("i: %d, q: %d, idx, %d\n", i, dp->data[i][idx].q, dp->data[i][idx].prev_q);
-        if(dp->data[i][idx].q >= 0) {
-            printf("%d %d ", dp->line_vertice[i], dp->data[i][idx].q);
-        }
+        printf("%d %d ", dp->line_vertice[i], dp->data[i][idx].q);
         idx = dp->data[i][idx].prev_q;
-        if (max <= 0);
     }
 
     printf("\b\n");
@@ -87,62 +81,28 @@ void iter(Dp *dp, int w_atual, int v_atual, int vertice) {
     int i = dp->h + 1;
     dp->line_vertice[i] = vertice;
 
-    for (int j = 1; j <= dp->m; j++) {
-        int max_value = dp->data[i-1][j].value;
-        int best_k = 0;
-        int prev_q = j;
+    int max_w = w_atual <= dp->m ? w_atual : dp->m;
 
-        int max_k = j / w_atual;
-        for (int k = 1; k <= max_k; k++) {
-            int peso_total = k * w_atual;
-            int valor = dp->data[i-1][j - peso_total].value + k * v_atual;
-            if (valor > max_value) {
-                max_value = valor;
-                best_k = k;
-                prev_q = j - peso_total;
-            }
-        }
-
-        dp->data[i][j].value = max_value;
-        dp->data[i][j].q = best_k;
-        dp->data[i][j].prev_q = prev_q;
+    for (int j = 0; j < max_w; j++) {
+        dp->data[i][j].value = dp->data[i-1][j].value;
+        dp->data[i][j].q = 0;
+        dp->data[i][j].prev_q = j;
     }
+
+    for (int j = w_atual; j <= dp->m; j++) {
+        int prev = dp->data[i-1][j].value;
+        int atual = dp->data[i][j - w_atual].value + v_atual;
+        if (atual > prev) {
+            dp->data[i][j].value = atual;
+            dp->data[i][j].q = dp->data[i][j - w_atual].q + 1;
+            dp->data[i][j].prev_q = dp->data[i][j - w_atual].prev_q;
+        } else {
+            dp->data[i][j].value = prev;
+            dp->data[i][j].q = 0;
+            dp->data[i][j].prev_q = j;
+        }
+    }
+
 
     dp->h = i;
 }
-
-
-void print_dp(Dp *dp) {
-    for (int i = 0; i <= dp->n; i++) {
-        for (int j = 0; j <= dp->m; j++) {
-            printf("(%d %d) + %dv ", i+1, j, dp->data[i][j].q);
-        }
-        printf("\n");
-    }
-}
-
-// int main() {
-//     int v[] = {2, 3, 4, 7, 3, 1};
-//     int w[] = {70, 100, 90, 20, 20, 10};
-//     int n = 6;
-//     int capacidade = 310;
-
-//     Dp *dp = dp_init(n, capacidade);
-
-//     for (int i = 0; i < n; i++) {
-//         iter(dp, w[i], v[i]);
-//     }
-
-//     for (int i = 0; i < n; i++) {
-//         undo(dp);
-//     }
-
-//     for (int i = 0; i < n; i++) {
-//         iter(dp, w[i], v[i]);
-//     }
-
-//     show(dp, w, v);
-//     free(dp->data);
-//     free(dp);
-//     return 0;
-// }

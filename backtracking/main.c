@@ -111,7 +111,7 @@ int main(int argc, char *argv[]){
                 reset_graph(g);
             };
 
-            show(max_dp, w, v);
+            show(max_dp);
 
             free_dp(dp);
             free_dp(max_dp);

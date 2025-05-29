@@ -19,6 +19,7 @@ typedef struct town {
     int size;
     int visitado;
     int is_root;
+    int *capacidade;
 } Town;
 
 typedef struct graph {

@@ -84,7 +84,7 @@ void copy_dp(Dp *dp1, Dp *dp2){
 void dfs(Graph *g, int start, int depth, Dp *dp, Dp *max_dp) {
     Town *atual = g->towns[start];
 
-    if (!atual->visitado) iter(dp, atual->w, atual->v, start + 1);
+    iter(dp, atual->w, atual->v, start + 1);
     int atual_visitado = atual->visitado;
     atual->visitado = 1; // Visitado do vértice para saber se já calculou na mochila
 
@@ -95,23 +95,24 @@ void dfs(Graph *g, int start, int depth, Dp *dp, Dp *max_dp) {
         int is_root = g->towns[id]->is_root;
 
         if (!visitado) {
+
             int new_depth = depth - atual->neighbors[i].dist;
 
-            if (new_depth >= 0 && !is_root) {
+            if (new_depth >= 0 && !is_root && !g->towns[id]->visitado) {
                 nao_tem_vizinho = 0;
                 atual->neighbors[i].visitado = 1;
                 dfs(g, id, new_depth, dp, max_dp);
                 atual->neighbors[i].visitado = 0;
             }
-            }
         }
-        if (nao_tem_vizinho) {
-            if (dp->data[dp->h][dp->m].value > max_dp->data[max_dp->h][max_dp->m].value) {
-                copy_dp(dp, max_dp); // Salva o melhor DP
-            }
     }
+    if (nao_tem_vizinho) {
+        if (dp->data[dp->h][dp->m].value > max_dp->data[max_dp->h][max_dp->m].value) {
+            copy_dp(dp, max_dp); // Salva o melhor DP
+        }
+    }
+    undo(dp);
     if (!atual_visitado) {
         atual->visitado = 0;
-        undo(dp);
     }
 }

@@ -1,4 +1,5 @@
 folders = obj
+CFLAGS = -O3
 OBJS = $(folders)/heuristica.o $(folders)/mochila.o $(folders)/solve.o
 SRCS = main.c
 
