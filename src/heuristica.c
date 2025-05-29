@@ -20,13 +20,15 @@ int get_max_inicial(Graph* g, int capacidade){
     int max = -1;
     int max_razao = 0;
     for (int i = 1; i < g->num_vertices; i++) {
+        printf("i %d\n", i);
         int razao = capacidade / g->towns[i].w * g->towns[i].v;
+        printf("razao %d\n", razao);
         if (razao > max_razao) {
             max_razao = razao;
             max = i;
         }
     }
-
+    printf("i %d: max razao %d\n", max, max_razao);
     return max;
 }
 

@@ -36,16 +36,19 @@ void free_dp(Dp *dp) {
 void show(Dp *dp, int *w, int *v) {
     int max = dp->data[dp->h][dp->m].value;
     int idx = dp->m;
+    printf("%d ", dp->data[dp->h][dp->m].value);
     for (int i = dp->h; i > 0; i--) {
         max -= dp->data[i][idx].q * v[i-1];
         
         // printf("i: %d, q: %d, idx, %d\n", i, dp->data[i][idx].q, dp->data[i][idx].prev_q);
         if(dp->data[i][idx].q >= 0) {
-            printf("Item (%d, %d): %d\n", dp->line_weight[i], dp->line_v[i], dp->data[i][idx].q);
+            printf("%d %d ", dp->line_vertice, dp->data[i][idx].q);
         }
         idx = dp->data[i][idx].prev_q;
         if (max <= 0);
     }
+
+    printf("\b\n");
 }
 void undo(Dp *dp) {
     if (dp->h <= 0) return;
@@ -80,7 +83,7 @@ void calc(Dp *dp, int *w, int *v) {
     }
 }
 
-void iter(Dp *dp, int w_atual, int v_atual) {
+void iter(Dp *dp, int w_atual, int v_atual, int vertice) {
     if (dp->h >= dp->n) {
         printf("[ ! ] Profundidade maior do que o numero de itens\n");
         return;
@@ -94,6 +97,7 @@ void iter(Dp *dp, int w_atual, int v_atual) {
     int i = dp->h + 1;
     dp->line_weight[i] = w_atual;
     dp->line_v[i] = v_atual;
+    dp->line_vertice = vertice;
 
     for (int j = 1; j <= dp->m; j++) {
         int max_value = dp->data[i-1][j].value;

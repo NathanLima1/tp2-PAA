@@ -97,7 +97,6 @@ int main(int argc, char *argv[]){
             }
             add_conn(g, pi - 1, pj - 1, di);
         }
-
         if (option == 2) {
             heuristica(g, max_depth, capacidade);
         } else {
@@ -118,6 +117,8 @@ int main(int argc, char *argv[]){
             free_dp(dp);
             free_dp(max_dp);
         }
+        free(v);
+        free(w);
         free_graph(g);
         k--;
     }

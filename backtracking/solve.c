@@ -85,7 +85,7 @@ void copy_dp(Dp *dp1, Dp *dp2){
 void dfs(Graph *g, int start, int depth, Dp *dp, Dp *max_dp) {
     Town *atual = g->towns[start];
 
-    if (!atual->visitado) iter(dp, atual->w, atual->v);
+    if (!atual->visitado) iter(dp, atual->w, atual->v, start);
     int atual_visitado = atual->visitado;
     atual->visitado = 1; // Visitado do vértice para saber se já calculou na mochila
 

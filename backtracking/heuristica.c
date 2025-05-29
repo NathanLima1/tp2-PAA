@@ -12,7 +12,6 @@ int get_max(Graph *g, int capacidade) {
             max = i;
         }
     }
-
     return max;
 }
 
@@ -21,11 +20,15 @@ neighbor get_max_viz(Graph *g, int capacidade, int viz) {
     int max_razao = 0;
     for (int i = 0; i < g->towns[viz]->num_neighbors; i++) {
         int id = g->towns[viz]->neighbors[i].id;
-        int razao = capacidade / g->towns[id]->w * g->towns[i]->v;
-        max_razao = razao;
-        max = id;
+        if (g->towns[id]->v == 0) continue; 
+        int razao = (g->towns[id]->w == 0) ? 0 : (capacidade / g->towns[id]->w) * g->towns[id]->v;
+        if (razao > max_razao) {
+            max_razao = razao;
+            max = i;
     }
-    neighbor n = {-1, -1, 0};
+    }
+
+    neighbor n = {-1, 100, 0};
     return (max != -1) ? g->towns[viz]->neighbors[max] : n;
 }
 
@@ -35,6 +38,7 @@ void heuristica(Graph *g, int max_depth, int capacidade) {
 
     int i = get_max(g, capacidade);
     int prev_i = i;
+
     int d = 0;
     neighbor n_i;
     int *solucao = malloc(sizeof(int) * max_depth*2);
@@ -58,15 +62,14 @@ void heuristica(Graph *g, int max_depth, int capacidade) {
         n_i = get_max_viz(g, capacidade, prev_i);
         i = n_i.id;
         d = n_i.dist;
-        printf("i: %d, d: %d\n", i, d);
         if (i == -1) break;
         j += 2;
     }
     
-    printf("%d ", habilidade);
+    printf("%d", habilidade);
 
     for(int i = 0; i <= j; i += 2) {
-        printf("%d %d ", solucao[i], solucao[i+1]);
+        printf(" %d %d", solucao[i], solucao[i+1]);
     }
     printf("\n");
 

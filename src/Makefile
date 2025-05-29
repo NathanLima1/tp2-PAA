@@ -15,10 +15,10 @@ $(folders):
 $(folders)/graph.o: graph.c graph.h
 	$(CC) $(CFLAGS) -c graph.c -o $@
 
-$(folders)/dp.o: dp.c solve.h graph.h
-	$(CC) $(CFLAGS) -c solve.c -o $@
+$(folders)/dp.o: dp.c dp.h graph.h
+	$(CC) $(CFLAGS) -c dp.c -o $@
 
-$(folders)/heuristica.o: heuristica.c heuristica.h solve.h graph.h
+$(folders)/heuristica.o: heuristica.c heuristica.h dp.h graph.h
 	$(CC) $(CFLAGS) -c heuristica.c -o $@
 
 clean:
