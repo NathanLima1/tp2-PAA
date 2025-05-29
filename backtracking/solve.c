@@ -73,8 +73,7 @@ void copy_dp(Dp *dp1, Dp *dp2){
     dp2->n = dp1->n;
 
     for (int i = 0; i <= dp2->n; i++) {
-        dp2->line_weight[i] = dp1->line_weight[i];
-        dp2->line_v[i] = dp1->line_v[i];
+        dp2->line_vertice[i] = dp1->line_vertice[i];
         for (int j = 0; j <= dp2->m; j++) {
             dp2->data[i][j].value = dp1->data[i][j].value;
             dp2->data[i][j].q = dp1->data[i][j].q;
@@ -85,7 +84,7 @@ void copy_dp(Dp *dp1, Dp *dp2){
 void dfs(Graph *g, int start, int depth, Dp *dp, Dp *max_dp) {
     Town *atual = g->towns[start];
 
-    if (!atual->visitado) iter(dp, atual->w, atual->v, start);
+    if (!atual->visitado) iter(dp, atual->w, atual->v, start + 1);
     int atual_visitado = atual->visitado;
     atual->visitado = 1; // Visitado do vértice para saber se já calculou na mochila
 
@@ -95,10 +94,10 @@ void dfs(Graph *g, int start, int depth, Dp *dp, Dp *max_dp) {
         int visitado = atual->neighbors[i].visitado; // Visitado na aresta (direcionada) para permitir retorno
         int is_root = g->towns[id]->is_root;
 
-        if (!visitado && !is_root) {
+        if (!visitado) {
             int new_depth = depth - atual->neighbors[i].dist;
 
-            if (new_depth >= 0) {
+            if (new_depth >= 0 && !is_root) {
                 nao_tem_vizinho = 0;
                 atual->neighbors[i].visitado = 1;
                 dfs(g, id, new_depth, dp, max_dp);

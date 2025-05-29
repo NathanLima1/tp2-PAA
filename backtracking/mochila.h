@@ -14,9 +14,7 @@ typedef struct {
     int n;
     int m;
     int h; // Profundidade calculada na matriz
-    int *line_v; // Valor da linha
-    int *line_weight; // Peso da linha
-    int line_vertice; // Vértice da linha
+    int *line_vertice; // Vértice da linha
 } Dp;
 
 Dp *dp_init(int n, int m);

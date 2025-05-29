@@ -111,7 +111,6 @@ int main(int argc, char *argv[]){
                 reset_graph(g);
             };
 
-            printf("Resposta:\n");
             show(max_dp, w, v);
 
             free_dp(dp);
