@@ -50,16 +50,6 @@ void undo(Dp *dp) {
 
 // https://youtu.be/OahcuBXLFlE
 void iter(Dp *dp, int w_atual, int v_atual, int vertice) {
-    if (dp->h >= dp->n) {
-        printf("[ ! ] Profundidade maior do que o numero de itens\n");
-        return;
-    }
-
-    if (w_atual == 0) {
-        printf("[ ! ] Peso atual igual a 0\n");
-        return;
-    }
-
     int i = dp->h + 1;
     dp->line_vertice[i] = vertice;
 
@@ -84,8 +74,6 @@ void iter(Dp *dp, int w_atual, int v_atual, int vertice) {
             dp->data[i][j].prev_q = j;
         }
     }
-
-
     dp->h = i;
 }
 

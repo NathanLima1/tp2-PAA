@@ -144,13 +144,13 @@ void dfs(Graph *g, int start, int depth, List *caminho, List *set, Dp *dp, Dp *m
     }
 }
 
+// Soluciona o problema
 void solve(Graph *g) {
     Dp *dp = dp_init(g->size, g->capacidade);
     Dp *max_dp = dp_init(g->size, g->capacidade);
 
     Trie_node *t = Trie_node_init(-1, g->size);
 
-    // O algoritmo inicia aqui
     for(int i = 0; i < g->size; i++){
         List *caminho = list_init(g->size);
         List *set = list_init(g->size);
