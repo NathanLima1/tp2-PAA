@@ -85,6 +85,19 @@ List *list_init(int size) {
     return list;
 }
 
+void processar_extremidade(Graph *g, Dp *dp, Dp *max_dp, Trie_node *t, List *set) {
+    int is_new_set = search_and_insert(t, g->size, set->data, set->size);
+    if (is_new_set) {
+        dp->h = 0;
+        for (int i = 0; i < set->size; i++) {
+            iter(dp, g->towns[set->data[i]]->w, g->towns[set->data[i]]->v, i + 1);
+        }
+        if (dp->data[dp->h][dp->m].value > max_dp->data[max_dp->h][max_dp->m].value) {
+            copy_dp(dp, max_dp); // Salva o melhor DP
+        }
+    }
+}
+
 void dfs(Graph *g, int start, int depth, List *caminho, List *set, Dp *dp, Dp *max_dp, Trie_node *t) {
     Town *atual = g->towns[start];
 
@@ -101,36 +114,29 @@ void dfs(Graph *g, int start, int depth, List *caminho, List *set, Dp *dp, Dp *m
 
     atual->visitado = 1; // Visita para não adicionar duas vezes no set
 
-    int nao_tem_vizinho = 1;
+    int tem_vizinho = 0;
     for(int i = 0; i < atual->num_neighbors; i++) {
         int id = atual->neighbors[i].id;
         int visitado = atual->neighbors[i].visitado; // Visitado na aresta (direcionada) para permitir retorno
 
         if (!visitado) {
-
             int new_depth = depth - atual->neighbors[i].dist;
 
+            // Se pode visitar, visita
             if (new_depth >= 0 && !g->towns[id]->visitado) {
-                nao_tem_vizinho = 0;
+                tem_vizinho = 1;
                 atual->neighbors[i].visitado = 1;
                 dfs(g, id, new_depth, caminho, set, dp, max_dp, t);
                 atual->neighbors[i].visitado = 0;
             }
         }
     }
-    if (nao_tem_vizinho) {
-        int is_new_set = search_and_insert(t, g->size, set->data, set->size);
-        if (is_new_set) {
-            dp->h = 0;
-            for (int i = 0; i < set->size; i++) {
-                iter(dp, g->towns[set->data[i]]->w, g->towns[set->data[i]]->v, i + 1);
-            }
-            if (dp->data[dp->h][dp->m].value > max_dp->data[max_dp->h][max_dp->m].value) {
-                copy_dp(dp, max_dp); // Salva o melhor DP
-            }
-        }
+
+    if (!tem_vizinho) {
+        processar_extremidade(g, dp, max_dp, t, set);
     }
-    // Atualiza o caminho
+
+    // Antes de retroceder
     caminho->size--;
     if (!atual_visitado) {
         atual->visitado = 0;

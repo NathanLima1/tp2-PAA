@@ -49,24 +49,6 @@ void undo(Dp *dp) {
 }
 
 // https://youtu.be/OahcuBXLFlE
-void calc(Dp *dp, int *w, int *v) {
-    for (int i = 1; i <= dp->n; i++) {
-        int w_atual = w[i-1];
-        int v_atual = v[i-1];
-        dp->line_vertice[i] = -1; // Implementar depois
-        for (int j = 1; j <= dp->m; j++) { // j capacidade
-            for (int k = 0; k <= j / w_atual; k++) {
-                if (dp->data[i][j].value < dp->data[i-1][j - k * w_atual].value + v_atual * k) {
-                    dp->data[i][j].value = dp->data[i-1][j - k * w_atual].value + v_atual * k;
-                    dp->data[i][j].q = k; // Quantidade do item atual
-                    dp->data[i][j].prev_q = j - k * w_atual; // Quantidade do item anterior 
-                }
-            }
-        }
-        dp->h = i;
-    }
-}
-
 void iter(Dp *dp, int w_atual, int v_atual, int vertice) {
     if (dp->h >= dp->n) {
         printf("[ ! ] Profundidade maior do que o numero de itens\n");

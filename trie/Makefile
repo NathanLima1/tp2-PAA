@@ -1,17 +1,20 @@
 folders = obj
 CFLAGS = -O3
-OBJS = $(folders)/heuristica.o $(folders)/mochila.o $(folders)/solve.o
+OBJS = $(folders)/heuristica.o $(folders)/mochila.o $(folders)/solve.o $(folders)/trie.o
+
 SRCS = main.c
 
 TARGET = tp2
 
 all: $(TARGET)
-
 $(TARGET): $(folders) $(OBJS) $(SRCS)
 	$(CC) $(CFLAGS) -o $@ $(SRCS) $(OBJS)
 
 $(folders):
 	mkdir -p $(folders)
+
+$(folders)/trie.o: trie.c trie.h
+	$(CC) $(CFLAGS) -c trie.c -o $@
 
 $(folders)/mochila.o: mochila.c mochila.h
 	$(CC) $(CFLAGS) -c mochila.c -o $@

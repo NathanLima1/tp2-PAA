@@ -19,7 +19,6 @@ typedef struct {
 
 Dp *dp_init(int n, int m);
 void free_dp(Dp *dp);
-void calc(Dp *dp, int *w, int *v);
 void show(Dp *dp);
 void undo(Dp *dp);
 void iter(Dp *dp, int w_atual, int v_atual, int vertice);
