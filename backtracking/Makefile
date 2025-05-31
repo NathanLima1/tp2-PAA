@@ -1,6 +1,6 @@
 folders = obj
-CFLAGS = -O3
-OBJS = $(folders)/heuristica.o $(folders)/mochila.o $(folders)/solve.o
+CFLAGS = -O3 -Wall
+OBJS = obj/dp.o obj/solve.o obj/heuristica.o obj/graph.o
 SRCS = main.c
 
 TARGET = tp2
@@ -10,18 +10,22 @@ all: $(TARGET)
 $(TARGET): $(folders) $(OBJS) $(SRCS)
 	$(CC) $(CFLAGS) -o $@ $(SRCS) $(OBJS)
 
-$(folders):
-	mkdir -p $(folders)
+obj/dp.o: src/dp.c include/dp.h
+	$(CC) $(CFLAGS) -c src/dp.c -o $@
 
-$(folders)/mochila.o: mochila.c mochila.h
-	$(CC) $(CFLAGS) -c mochila.c -o $@
+obj/solve.o: src/solve.c include/solve.h include/dp.h include/graph.h
+	$(CC) $(CFLAGS) -c src/solve.c -o $@
 
-$(folders)/solve.o: solve.c solve.h mochila.h
-	$(CC) $(CFLAGS) -c solve.c -o $@
+obj/heuristica.o: src/heuristica.c include/heuristica.h include/solve.h include/dp.h
+	$(CC) $(CFLAGS) -c src/heuristica.c -o $@
 
-$(folders)/heuristica.o: heuristica.c heuristica.h solve.h mochila.h
-	$(CC) $(CFLAGS) -c heuristica.c -o $@
+obj/graph.o: src/graph.c include/graph.h
+	$(CC) $(CFLAGS) -c src/graph.c -o $@
+
+folders:
+obj:
+	mkdir -p obj
 
 clean:
-	rm -f $(folders)/*.o $(TARGET)
-	rm -r $(folders)
+	rm -f obj/*.o $(TARGET)
+	rm -r obj

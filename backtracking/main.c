@@ -6,8 +6,8 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <stdbool.h>
-#include "solve.h"
-#include "heuristica.h"
+#include "include/solve.h"
+#include "include/heuristica.h"
 
 int main(int argc, char *argv[]){
     FILE *fp = stdin;
@@ -77,16 +77,16 @@ int main(int argc, char *argv[]){
         int num_vertices = p;
         int max_depth = d;
         int capacidade = w;
-        int *v = malloc(p * sizeof(int));
-        int *w = malloc(p * sizeof(int));
+        int *values = malloc(p * sizeof(int));
+        int *weights = malloc(p * sizeof(int));
 
         for(int i = 0; i < p; i++){
             if(fscanf(fp, "%d %d %d", &pi, &wi, &hi) != 3){
                 printf("Erro ao ler o arquivo\n");
                 exit(1);
             }
-            v[pi - 1] = hi;
-            w[pi - 1] = wi;
+            values[pi - 1] = hi;
+            weights[pi - 1] = wi;
             g->towns[pi - 1]->w = wi;
             g->towns[pi - 1]->v = hi;
         }
@@ -100,14 +100,12 @@ int main(int argc, char *argv[]){
         if (option == 2) {
             heuristica(g, max_depth, capacidade);
         } else {
-            Dp *dp = dp_init(num_vertices, capacidade);
-            Dp *max_dp = dp_init(num_vertices, capacidade);
+            Dp *dp = dp_init(max_depth + 1, capacidade);
+            Dp *max_dp = dp_init(max_depth + 1, capacidade);
 
-
-            // O algoritmo inicia aqui
+            // Inicia um DFS a partir de todos os vértices
             for(int i = 0; i < num_vertices; i++){
                 dfs(g, i, max_depth, dp, max_dp);
-                reset_graph(g);
             };
 
             show(max_dp);
@@ -115,8 +113,8 @@ int main(int argc, char *argv[]){
             free_dp(dp);
             free_dp(max_dp);
         }
-        free(v);
-        free(w);
+        free(values);
+        free(weights);
         free_graph(g);
         k--;
     }

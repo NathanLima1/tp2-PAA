@@ -6,8 +6,8 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <stdbool.h>
-#include "solve.h"
-#include "heuristica.h"
+#include "include/solve.h"
+#include "include/heuristica.h"
 
 int main(int argc, char *argv[]){
     FILE *fp = stdin;
@@ -74,24 +74,24 @@ int main(int argc, char *argv[]){
         // Graph* graph = create_graph(p, c);
 
         Graph *g = init_graph(p);
-        int num_vertices = p;
         g->max_depth = d;
         g->capacidade = w;
         int max_depth = d;
         int capacidade = w;
-        int *v = malloc(p * sizeof(int));
-        int *w = malloc(p * sizeof(int));
+        g->values = malloc(p * sizeof(int));
+        g->weights = malloc(p * sizeof(int));
 
         for(int i = 0; i < p; i++){
             if(fscanf(fp, "%d %d %d", &pi, &wi, &hi) != 3){
                 printf("Erro ao ler o arquivo\n");
                 exit(1);
             }
-            v[pi - 1] = hi;
-            w[pi - 1] = wi;
+            g->values[pi - 1] = hi;
+            g->weights[pi - 1] = wi;
             g->towns[pi - 1]->w = wi;
             g->towns[pi - 1]->v = hi;
         }
+
         for(int i = 0; i < c; i++){
             if(fscanf(fp, "%d %d %d", &pi, &pj, &di) != 3){
                 printf("Erro ao ler o arquivo\n");
@@ -106,8 +106,6 @@ int main(int argc, char *argv[]){
             solve(g);
         }
 
-        free(v);
-        free(w);
         free_graph(g);
         k--;
     }
