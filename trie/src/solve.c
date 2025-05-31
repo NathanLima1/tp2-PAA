@@ -10,6 +10,11 @@ List *list_init(int size) {
     return list;
 }
 
+void free_list(List* l){
+    free(l->data);
+    free(l);
+}
+
 void copy_dp(Dp *dp1, Dp *dp2){
     dp2->h = dp1->h;
     dp2->m = dp1->m;
@@ -104,8 +109,8 @@ void solve(Graph *g) {
         List *caminho = list_init(g->size);
         List *set = list_init(g->size);
         dfs(g, i, g->max_depth, caminho, set, dp, max_dp, t);
-        free(caminho);
-        free(set);
+        free_list(caminho);
+        free_list(set);
     };
 
     show(max_dp);

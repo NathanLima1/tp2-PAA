@@ -10,8 +10,11 @@ typedef struct {
     int size;
 } List;
 
+// Libera memória alocada para a lista
+void free_list(List* l);
+
 // Funções de manipulação do grafo
-List *list_inint(int size);
+List *list_init(int size);
 
 // Funções auxiliares para DP
 void copy_dp(Dp *dp1, Dp *dp2);
