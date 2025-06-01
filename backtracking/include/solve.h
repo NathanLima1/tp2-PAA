@@ -11,6 +11,6 @@ void copy_dp(Dp *dp1, Dp *dp2);
 void dfs(Graph *g, int start, int root, int depth, Dp *dp, Dp *max_dp);
 
 // Mostra a solução
-void show(Dp *dp);
+void show(Dp *dp, FILE* fp_out);
 
-#endif // SOLVE_H
+#endif

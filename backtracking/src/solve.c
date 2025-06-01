@@ -52,13 +52,13 @@ void dfs(Graph *g, int start, int root, int depth, Dp *dp, Dp *max_dp) {
     undo(dp);
 }
 
-void show(Dp *dp) {
+void show(Dp *dp, FILE* fp_out) {
     int idx = dp->m;
-    printf("%d ", dp->data[dp->h][dp->m].value);
+    fprintf(fp_out, "%d", dp->data[dp->h][dp->m].value);
     for (int i = dp->h; i > 0; i--) {
-        printf("%d %d ", dp->line_vertice[i], dp->data[i][idx].q);
+        fprintf(fp_out, " %d %d", dp->line_vertice[i], dp->data[i][idx].q);
         idx = dp->data[i][idx].prev_q;
     }
 
-    printf("\b\n");
+    fprintf(fp_out, "\n");
 }

@@ -98,7 +98,7 @@ int main(int argc, char *argv[]){
             add_conn(g, pi - 1, pj - 1, di);
         }
         if (option == 2) {
-            heuristica(g, max_depth, capacidade);
+            heuristica(g, max_depth, capacidade, fp_out);
         } else {
             Dp *dp = dp_init(max_depth + 1, capacidade);
             Dp *max_dp = dp_init(max_depth + 1, capacidade);
@@ -108,7 +108,7 @@ int main(int argc, char *argv[]){
                 dfs(g, i, i, max_depth, dp, max_dp);
             };
 
-            show(max_dp);
+            show(max_dp, fp_out);
 
             free_dp(dp);
             free_dp(max_dp);

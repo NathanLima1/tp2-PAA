@@ -33,7 +33,7 @@ neighbor get_max_viz(Graph *g, int capacidade, int viz) {
 }
 
 
-void heuristica(Graph *g, int max_depth, int capacidade) {
+void heuristica(Graph *g, int max_depth, int capacidade, FILE* fp_out) {
     int habilidade = 0;
 
     int i = get_max(g, capacidade);
@@ -66,12 +66,12 @@ void heuristica(Graph *g, int max_depth, int capacidade) {
         j += 2;
     }
     
-    printf("%d", habilidade);
+    fprintf(fp_out, "%d", habilidade);
 
     for(int i = 0; i <= j; i += 2) {
-        printf(" %d %d", solucao[i], solucao[i+1]);
+        fprintf(fp_out, " %d %d", solucao[i], solucao[i+1]);
     }
-    printf("\n");
+    fprintf(fp_out, "\n");
 
     free(solucao);
 }
