@@ -8,10 +8,12 @@ int get_max(Graph *g, int capacidade) {
     float max_razao = 0;
     for (int i = 1; i < g->size; i++) {
         int value = capacidade / g->towns[i]->w * g->towns[i]->v;
+        if (!value) continue;
+
         float razao = (float)g->towns[i]->v / g->towns[i]->w;
 
         // Valoriza itens que têm uma razão boa e que preenchem bem a mochila
-        if (razao > max_razao && value > (max_value * 0.8)) {
+        if (razao > max_razao && value > max_value) {
             max_value = value;
             max_razao = razao;
             max = i;
