@@ -105,7 +105,7 @@ int main(int argc, char *argv[]){
 
             // Inicia um DFS a partir de todos os vértices
             for(int i = 0; i < num_vertices; i++){
-                dfs(g, i, max_depth, dp, max_dp);
+                dfs(g, i, i, max_depth, dp, max_dp);
             };
 
             show(max_dp);

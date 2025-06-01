@@ -16,7 +16,7 @@ void copy_dp(Dp *dp1, Dp *dp2){
         }
     }
 }
-void dfs(Graph *g, int start, int depth, Dp *dp, Dp *max_dp) {
+void dfs(Graph *g, int start, int root, int depth, Dp *dp, Dp *max_dp) {
     Town *atual = g->towns[start];
 
     iter(dp, atual->w, atual->v, start + 1);
@@ -28,21 +28,23 @@ void dfs(Graph *g, int start, int depth, Dp *dp, Dp *max_dp) {
         // Visita em apenas uma direção na aresta, para permitir retorno em outra direção e acesso à bifurcações
         int visitado = atual->neighbors[i].visitado;
 
-        if (!visitado) {
+         // Não há necessidade de voltar para a raiz
+         // Ela já será acessada futuramente pela mesma combinação e com uma distância restante maior
+        if (!visitado && id != root) {
 
             int new_depth = depth - atual->neighbors[i].dist;
 
             if (new_depth >= 0) {
                 tem_vizinho = 1;
                 atual->neighbors[i].visitado = 1;
-                dfs(g, id, new_depth, dp, max_dp);
+                dfs(g, id, root, new_depth, dp, max_dp);
                 atual->neighbors[i].visitado = 0;
             }
         }
     }
 
     // Chegou na extremidade
-    if (!tem_vizinho) {
+    if (!tem_vizinho && atual->id != root) {
         if (dp->data[dp->h][dp->m].value > max_dp->data[max_dp->h][max_dp->m].value) {
             copy_dp(dp, max_dp); // Salva o melhor DP
         }

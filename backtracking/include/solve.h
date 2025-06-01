@@ -8,7 +8,7 @@
 void copy_dp(Dp *dp1, Dp *dp2);
 
 // DFS para resolver o problema
-void dfs(Graph *g, int start, int depth, Dp *dp, Dp *max_dp);
+void dfs(Graph *g, int start, int root, int depth, Dp *dp, Dp *max_dp);
 
 // Mostra a solução
 void show(Dp *dp);
