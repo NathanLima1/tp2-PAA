@@ -44,7 +44,7 @@ void dfs(Graph *g, int start, int root, int depth, Dp *dp, Dp *max_dp) {
     }
 
     // Chegou na extremidade
-    if (!tem_vizinho && atual->id != root) {
+    if (!tem_vizinho) {
         if (dp->data[dp->h][dp->m].value > max_dp->data[max_dp->h][max_dp->m].value) {
             copy_dp(dp, max_dp); // Salva o melhor DP
         }

@@ -77,16 +77,12 @@ int main(int argc, char *argv[]){
         int num_vertices = p;
         int max_depth = d;
         int capacidade = w;
-        int *values = malloc(p * sizeof(int));
-        int *weights = malloc(p * sizeof(int));
 
         for(int i = 0; i < p; i++){
             if(fscanf(fp, "%d %d %d", &pi, &wi, &hi) != 3){
                 printf("Erro ao ler o arquivo\n");
                 exit(1);
             }
-            values[pi - 1] = hi;
-            weights[pi - 1] = wi;
             g->towns[pi - 1]->w = wi;
             g->towns[pi - 1]->v = hi;
         }
@@ -113,8 +109,6 @@ int main(int argc, char *argv[]){
             free_dp(dp);
             free_dp(max_dp);
         }
-        free(values);
-        free(weights);
         free_graph(g);
         k--;
     }
